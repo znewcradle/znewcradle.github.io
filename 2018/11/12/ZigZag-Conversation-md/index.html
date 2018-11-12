@@ -79,20 +79,20 @@
 
 
 
-<meta name="description" content="Longest Substring Without Repeating Characters一、 问题描述 问题难度：Medium 二、 解决方法（一）暴力求解 找出该字符串的所有子串并判断是否重复子串，取不重复子串的最长值并返回。但是时间复杂度为O(n^3^)，超时。 123456789101112public int lengthOfLongestSubstring(String s)&amp;#12">
+<meta name="description" content="ZigZag Conversation一、 问题描述 问题难度：Medium 二、解决方法 直接创建多个“容器”(StringBuilder)来模拟ZigZag的过程，并保存每一行的字符；最后按顺序将容器中的字符拼接在一起即结果。时间复杂度是O(n)，空间复杂度是O(n)  1234567891011121314151617181920212223public String convert(Str">
 <meta name="keywords" content="leetcode,leetcode-medium,algorithm">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Longest Substring Without Repeating Characters">
-<meta property="og:url" content="http://yoursite.com/2018/11/04/Longest-Substring-Without-Repeating-Characters/index.html">
+<meta property="og:title" content="ZigZag Conversation.md">
+<meta property="og:url" content="http://yoursite.com/2018/11/12/ZigZag-Conversation-md/index.html">
 <meta property="og:site_name" content="Znewradle&#39;s blog">
-<meta property="og:description" content="Longest Substring Without Repeating Characters一、 问题描述 问题难度：Medium 二、 解决方法（一）暴力求解 找出该字符串的所有子串并判断是否重复子串，取不重复子串的最长值并返回。但是时间复杂度为O(n^3^)，超时。 123456789101112public int lengthOfLongestSubstring(String s)&amp;#12">
+<meta property="og:description" content="ZigZag Conversation一、 问题描述 问题难度：Medium 二、解决方法 直接创建多个“容器”(StringBuilder)来模拟ZigZag的过程，并保存每一行的字符；最后按顺序将容器中的字符拼接在一起即结果。时间复杂度是O(n)，空间复杂度是O(n)  1234567891011121314151617181920212223public String convert(Str">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://gckuqg.ch.files.1drv.com/y4mUAYiD0FQFCYubCW_DZb158ddPgPUeDarYYWV9LaQla6aSc9fwGx3WR2cBKJtZ5knDLNsjwLaiMxQCQPwk1mr6kZp9zpSipqZggysOk0X6cYIX2kg98COyMFJ0YxYDDDaQP_5Se43w6favF0TElAGBQ1kb4c_Nc9-rZ25Ph9buOOyTFgfsUsa_0NVUCJ-k0qCl49rueoHnBT9fnnj3s5uwQ?width=1153&height=262&cropmode=none">
-<meta property="og:updated_time" content="2018-11-04T14:42:57.815Z">
+<meta property="og:image" content="https://gcioca.ch.files.1drv.com/y4mUQtxsGh4-yim8l7NpAhYxDJ_LdwYj44rAzLZ-edauLBsZ8DN6qbH2KypMUkgimZZgKEhzOOgvX_yVTD3xpZpSU0wiooucQOQzf_aFUpvsoADQkStZBHFDvqafF-N_D6j70mFHCVxY9d_bI4u3vd9OFOqT4C5IFPwPrd_fyXSv1mDbuPhwsObohs6V6dv84M9_f6GH3iHWWmy9wXLETqOZA?width=1202&height=868&cropmode=none">
+<meta property="og:updated_time" content="2018-11-12T10:59:16.949Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Longest Substring Without Repeating Characters">
-<meta name="twitter:description" content="Longest Substring Without Repeating Characters一、 问题描述 问题难度：Medium 二、 解决方法（一）暴力求解 找出该字符串的所有子串并判断是否重复子串，取不重复子串的最长值并返回。但是时间复杂度为O(n^3^)，超时。 123456789101112public int lengthOfLongestSubstring(String s)&amp;#12">
-<meta name="twitter:image" content="https://gckuqg.ch.files.1drv.com/y4mUAYiD0FQFCYubCW_DZb158ddPgPUeDarYYWV9LaQla6aSc9fwGx3WR2cBKJtZ5knDLNsjwLaiMxQCQPwk1mr6kZp9zpSipqZggysOk0X6cYIX2kg98COyMFJ0YxYDDDaQP_5Se43w6favF0TElAGBQ1kb4c_Nc9-rZ25Ph9buOOyTFgfsUsa_0NVUCJ-k0qCl49rueoHnBT9fnnj3s5uwQ?width=1153&height=262&cropmode=none">
+<meta name="twitter:title" content="ZigZag Conversation.md">
+<meta name="twitter:description" content="ZigZag Conversation一、 问题描述 问题难度：Medium 二、解决方法 直接创建多个“容器”(StringBuilder)来模拟ZigZag的过程，并保存每一行的字符；最后按顺序将容器中的字符拼接在一起即结果。时间复杂度是O(n)，空间复杂度是O(n)  1234567891011121314151617181920212223public String convert(Str">
+<meta name="twitter:image" content="https://gcioca.ch.files.1drv.com/y4mUQtxsGh4-yim8l7NpAhYxDJ_LdwYj44rAzLZ-edauLBsZ8DN6qbH2KypMUkgimZZgKEhzOOgvX_yVTD3xpZpSU0wiooucQOQzf_aFUpvsoADQkStZBHFDvqafF-N_D6j70mFHCVxY9d_bI4u3vd9OFOqT4C5IFPwPrd_fyXSv1mDbuPhwsObohs6V6dv84M9_f6GH3iHWWmy9wXLETqOZA?width=1202&height=868&cropmode=none">
 
 
 
@@ -122,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/11/04/Longest-Substring-Without-Repeating-Characters/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/11/12/ZigZag-Conversation-md/"/>
 
 
 
 
 
-  <title>Longest Substring Without Repeating Characters | Znewradle's blog</title>
+  <title>ZigZag Conversation.md | Znewradle's blog</title>
   
 
 
@@ -255,7 +255,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/04/Longest-Substring-Without-Repeating-Characters/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/12/ZigZag-Conversation-md/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="znewcradle">
@@ -272,7 +272,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Longest Substring Without Repeating Characters</h1>
+          <h1 class="post-title" itemprop="name headline">ZigZag Conversation.md</h1>
         
 
         <div class="post-meta">
@@ -284,8 +284,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-04T21:07:02+08:00">
-                2018-11-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-12T18:33:13+08:00">
+                2018-11-12
               </time>
             
 
@@ -325,8 +325,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/11/04/Longest-Substring-Without-Repeating-Characters/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/11/04/Longest-Substring-Without-Repeating-Characters/" itemprop="commentCount"></span>
+                <a href="/2018/11/12/ZigZag-Conversation-md/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/11/12/ZigZag-Conversation-md/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -354,21 +354,17 @@
       
 
       
-        <h2 id="Longest-Substring-Without-Repeating-Characters"><a href="#Longest-Substring-Without-Repeating-Characters" class="headerlink" title="Longest Substring Without Repeating Characters"></a>Longest Substring Without Repeating Characters</h2><h3 id="一、-问题描述"><a href="#一、-问题描述" class="headerlink" title="一、 问题描述"></a>一、 问题描述</h3><p><img src="https://gckuqg.ch.files.1drv.com/y4mUAYiD0FQFCYubCW_DZb158ddPgPUeDarYYWV9LaQla6aSc9fwGx3WR2cBKJtZ5knDLNsjwLaiMxQCQPwk1mr6kZp9zpSipqZggysOk0X6cYIX2kg98COyMFJ0YxYDDDaQP_5Se43w6favF0TElAGBQ1kb4c_Nc9-rZ25Ph9buOOyTFgfsUsa_0NVUCJ-k0qCl49rueoHnBT9fnnj3s5uwQ?width=1153&amp;height=262&amp;cropmode=none" alt="des"></p>
+        <h2 id="ZigZag-Conversation"><a href="#ZigZag-Conversation" class="headerlink" title="ZigZag Conversation"></a>ZigZag Conversation</h2><h3 id="一、-问题描述"><a href="#一、-问题描述" class="headerlink" title="一、 问题描述"></a>一、 问题描述</h3><p><img src="https://gcioca.ch.files.1drv.com/y4mUQtxsGh4-yim8l7NpAhYxDJ_LdwYj44rAzLZ-edauLBsZ8DN6qbH2KypMUkgimZZgKEhzOOgvX_yVTD3xpZpSU0wiooucQOQzf_aFUpvsoADQkStZBHFDvqafF-N_D6j70mFHCVxY9d_bI4u3vd9OFOqT4C5IFPwPrd_fyXSv1mDbuPhwsObohs6V6dv84M9_f6GH3iHWWmy9wXLETqOZA?width=1202&amp;height=868&amp;cropmode=none" alt="ZigZag Conversation"></p>
 <p>问题难度：Medium</p>
-<h3 id="二、-解决方法"><a href="#二、-解决方法" class="headerlink" title="二、 解决方法"></a>二、 解决方法</h3><p>（一）暴力求解</p>
-<p>找出该字符串的所有子串并判断是否重复子串，取不重复子串的最长值并返回。但是时间复杂度为O(n^3^)，超时。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(String s)</span></span>&#123;</div><div class="line">	<span class="keyword">int</span> n = s.length(), ans = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++ i) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; n; ++ j) &#123;</div><div class="line">            <span class="keyword">if</span> (allUnique(s, i, j)) &#123; ans = Math.max(ans, i - j); &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> ans;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">allUnique</span><span class="params">(String s, <span class="keyword">int</span> start, <span class="keyword">int</span> end)</span> </span>&#123;</div><div class="line">    Set&lt;Character&gt; set = <span class="keyword">new</span> HashSet</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>（二）滑动窗口</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">lengthOfLongestSubstring</span><span class="params">(String s)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> length = s.length();</div><div class="line">    Set&lt;Character&gt; set = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line">    <span class="keyword">int</span> ans = <span class="number">0</span>, i = <span class="number">0</span>, j = <span class="number">0</span>;</div><div class="line">    <span class="keyword">while</span> (i &lt; length &amp;&amp; j &lt; length) &#123;</div><div class="line">        <span class="keyword">if</span> (! set.contains(s.charAt(j))) &#123;</div><div class="line">            set.add(s.charAt(j ++));</div><div class="line">            ans = Math.max(ans, j - i);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            set.remove(s.charAt(i ++));</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>滑动窗口由<code>(i, j)</code>来维护，由Set保存，如果遇到重复则将<code>i</code>“移动”到与<code>s.charAt(j)</code>重复的字符后一字符，使得<code>j</code>继续延伸。时间复杂度为O(2n) = O(n)，上例中每个Character都会被<code>i</code>和<code>j</code>访问一次，共两次。</p>
-<p>（三）优化的滑动窗口</p>
-<p>用Map取代Set来保存滑动窗口，可以快速跳过重复的Character，时间复杂度为O(n)，空间复杂度为O(min(m, n))。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestOfSubstring</span><span class="params">(String s)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> length = s.length();</div><div class="line">    Map&lt;Character, Integer&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>, i = <span class="number">0</span>; j &lt; n; ++ j) &#123;</div><div class="line">        <span class="keyword">if</span> (map.containsKey(s.charAt(j))) &#123;</div><div class="line">            <span class="comment">// 避免跳到更前面已经被检验过的字符</span></div><div class="line">            i = Math.max(map.get(s.charAt(j)), i);</div><div class="line">        &#125;</div><div class="line">        ans = Math.max(ans, j - i + <span class="number">1</span>);</div><div class="line">        <span class="comment">// 保存是重复字符位置的下一个位置</span></div><div class="line">        map.put(s.charAt(j), j + <span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="三、总结-amp-收获"><a href="#三、总结-amp-收获" class="headerlink" title="三、总结 &amp; 收获"></a>三、总结 &amp; 收获</h3><ul>
-<li>要充分利用Set和Map这种集合类的特点</li>
-<li>滑动窗口是处理substring问题的一个思路</li>
-</ul>
+<h3 id="二、解决方法"><a href="#二、解决方法" class="headerlink" title="二、解决方法"></a>二、解决方法</h3><ol>
+<li>直接创建多个“容器”(<code>StringBuilder</code>)来模拟ZigZag的过程，并保存每一行的字符；最后按顺序将容器中的字符拼接在一起即结果。时间复杂度是O(n)，空间复杂度是O(n)</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">convert</span><span class="params">(String s, <span class="keyword">int</span> numRows)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (numRows == <span class="number">1</span>) &#123; <span class="keyword">return</span> s; &#125;</div><div class="line">    <span class="comment">// 创建行容器</span></div><div class="line">    List&lt;StringBuilder&gt; rows = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; Math.min(numRows, s.length()); ++ i) &#123;</div><div class="line">        rows.add(<span class="keyword">new</span> StringBuilder());</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 遍历，模拟ZigZag</span></div><div class="line">    <span class="keyword">int</span> curRow = <span class="number">0</span>;</div><div class="line">    <span class="keyword">boolean</span> goingDown = <span class="keyword">true</span>;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">char</span> c: s.toCharArray) &#123;</div><div class="line">        rows.get(curRow).append(c);</div><div class="line">        <span class="comment">// 发生转向的时刻</span></div><div class="line">        <span class="keyword">if</span> (curRow == <span class="number">0</span> || curRow == numRows - <span class="number">1</span>) &#123;</div><div class="line">			goingDown = !goingDown</div><div class="line">        &#125;</div><div class="line">        curRow += goingDown ? <span class="number">1</span>: -<span class="number">1</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 拼接容器中的字符</span></div><div class="line">    StringBuilder ret = <span class="keyword">new</span> StringBuilder();</div><div class="line">    <span class="keyword">for</span> (StringBuilder row: rows) &#123; ret.append(ret); &#125;</div><div class="line">    <span class="keyword">return</span> ret.toString();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>发现<code>ZigZag</code>的规律，如果总行数为k，则在第i行的字符的数组下标为<code>k(2 * numRows - 2) + i</code>和<code>(k+1)(2 * numRows - 2) - i</code></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">convert</span><span class="params">(String s, <span class="keyword">int</span> numRows)</span> </span>&#123;</div><div class="line">	<span class="keyword">if</span> (numRows == <span class="number">1</span>) &#123; <span class="keyword">return</span> s; &#125;</div><div class="line">    </div><div class="line">    StringBuilder ret = <span class="keyword">new</span> StringBuilder();</div><div class="line">    <span class="keyword">int</span> n = s.length();</div><div class="line">    <span class="comment">// 每次循环的间隔</span></div><div class="line">    <span class="keyword">int</span> cycleLen = <span class="number">2</span> * numRows - <span class="number">2</span>;</div><div class="line">    </div><div class="line">    <span class="comment">// 按行添加到结果中</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numRows; ++ i) &#123;</div><div class="line">        <span class="comment">// 第i行</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j + i &lt; n; j += cycleLen) &#123;</div><div class="line">            ret.append(s.charAt(j + i));</div><div class="line">            <span class="comment">// 非第0和numRows-1行会多一个字符</span></div><div class="line">            <span class="keyword">if</span> (i != <span class="number">0</span> &amp;&amp; i != numRows - <span class="number">1</span> &amp;&amp; j + cycleLen - i &lt; n)</div><div class="line">                ret.append(s.charAt(j + cycleLen - i));</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> ret.toString();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="三、总结"><a href="#三、总结" class="headerlink" title="三、总结"></a>三、总结</h3><p>两种解决方案，一个是模拟过程得到最后的结果；一个是结果出发发现规律；代表了解题的两种思路——从上到下和从下到上。</p>
 
       
     </div>
@@ -403,8 +399,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/11/04/Add-Two-Numbers/" rel="next" title="Add Two Numbers">
-                <i class="fa fa-chevron-left"></i> Add Two Numbers
+              <a href="/2018/11/07/longest-palindromic-substring/" rel="next" title="longest-palindromic substring">
+                <i class="fa fa-chevron-left"></i> longest-palindromic substring
               </a>
             
           </div>
@@ -412,10 +408,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/11/04/medianOfTwoSortedArrays/" rel="prev" title="medianOfTwoSortedArrays">
-                medianOfTwoSortedArrays <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -446,8 +438,8 @@
 
   
     <div class="comments" id="comments">
-      <div class="ds-thread" data-thread-key="2018/11/04/Longest-Substring-Without-Repeating-Characters/"
-           data-title="Longest Substring Without Repeating Characters" data-url="http://yoursite.com/2018/11/04/Longest-Substring-Without-Repeating-Characters/">
+      <div class="ds-thread" data-thread-key="2018/11/12/ZigZag-Conversation-md/"
+           data-title="ZigZag Conversation.md" data-url="http://yoursite.com/2018/11/12/ZigZag-Conversation-md/">
       </div>
     </div>
 
@@ -564,7 +556,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Longest-Substring-Without-Repeating-Characters"><span class="nav-number">1.</span> <span class="nav-text">Longest Substring Without Repeating Characters</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、-问题描述"><span class="nav-number">1.1.</span> <span class="nav-text">一、 问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、-解决方法"><span class="nav-number">1.2.</span> <span class="nav-text">二、 解决方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、总结-amp-收获"><span class="nav-number">1.3.</span> <span class="nav-text">三、总结 & 收获</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ZigZag-Conversation"><span class="nav-number">1.</span> <span class="nav-text">ZigZag Conversation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、-问题描述"><span class="nav-number">1.1.</span> <span class="nav-text">一、 问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、解决方法"><span class="nav-number">1.2.</span> <span class="nav-text">二、解决方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、总结"><span class="nav-number">1.3.</span> <span class="nav-text">三、总结</span></a></li></ol></li></ol></div>
             
 
           </div>
