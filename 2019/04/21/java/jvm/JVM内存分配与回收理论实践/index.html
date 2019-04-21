@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="jvm,java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="JVM内存分配与回收理论实践虚拟机性能监控与故障处理工具概述2-3章：JVM内存分配与回收理论；4-5章实践 JDK命令行工具  在bin目录下有诸多JVM监视和故障处理工具   jps：虚拟机进程状况工具（JVM Process Status Tool） 显示JVM执行主类Main Class + 进程本地JVM唯一ID，即LVMID（与OS的进程ID一直），命令格式：jps [options]">
+<meta name="keywords" content="jvm,java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="垃圾收集与内存分配策略">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/java/jvm/JVM内存分配与回收理论实践/index.html">
+<meta property="og:site_name" content="Znewradle&#39;s blog">
+<meta property="og:description" content="JVM内存分配与回收理论实践虚拟机性能监控与故障处理工具概述2-3章：JVM内存分配与回收理论；4-5章实践 JDK命令行工具  在bin目录下有诸多JVM监视和故障处理工具   jps：虚拟机进程状况工具（JVM Process Status Tool） 显示JVM执行主类Main Class + 进程本地JVM唯一ID，即LVMID（与OS的进程ID一直），命令格式：jps [options]">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T02:53:14.009Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="垃圾收集与内存分配策略">
+<meta name="twitter:description" content="JVM内存分配与回收理论实践虚拟机性能监控与故障处理工具概述2-3章：JVM内存分配与回收理论；4-5章实践 JDK命令行工具  在bin目录下有诸多JVM监视和故障处理工具   jps：虚拟机进程状况工具（JVM Process Status Tool） 显示JVM执行主类Main Class + 进程本地JVM唯一ID，即LVMID（与OS的进程ID一直），命令格式：jps [options]">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/java/jvm/JVM内存分配与回收理论实践/"/>
+
+
+
+
+
+  <title>垃圾收集与内存分配策略 | Znewradle's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Znewradle's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/java/jvm/JVM内存分配与回收理论实践/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="znewcradle">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Znewradle's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">垃圾收集与内存分配策略</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T10:45:42+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/21/java/jvm/JVM内存分配与回收理论实践/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/21/java/jvm/JVM内存分配与回收理论实践/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="JVM内存分配与回收理论实践"><a href="#JVM内存分配与回收理论实践" class="headerlink" title="JVM内存分配与回收理论实践"></a>JVM内存分配与回收理论实践</h2><h3 id="虚拟机性能监控与故障处理工具"><a href="#虚拟机性能监控与故障处理工具" class="headerlink" title="虚拟机性能监控与故障处理工具"></a>虚拟机性能监控与故障处理工具</h3><h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>2-3章：JVM内存分配与回收理论；4-5章实践</p>
+<h4 id="JDK命令行工具"><a href="#JDK命令行工具" class="headerlink" title="JDK命令行工具"></a>JDK命令行工具</h4><blockquote>
+<p> 在bin目录下有诸多JVM监视和故障处理工具</p>
+</blockquote>
+<ol>
+<li>jps：虚拟机进程状况工具（JVM Process Status Tool）<ul>
+<li>显示JVM执行主类Main Class + 进程本地JVM唯一ID，即LVMID（与OS的进程ID一直），命令格式：<code>jps [options] [hostid]</code>，选项：-q只输出LVMID；-m显示启动时传给Main Class的main()的参数；-l输出主类全名，如果是jar包则输出jar包路径；-v输出VM进程启动时JVM参数</li>
+</ul>
+</li>
+<li>jstat：虚拟机统计信息监视工具（JVM Statistics Monitoring Tool）<ul>
+<li>监视虚拟机运行状态信息（类装载，内存、垃圾收集、JIT编译等），命令：<code>jstat [option vmid[interval[s|ms][count]]]</code>；如果是本地虚拟机进程则VMID与LVMID一致，若是远程VM进程，则VMID格式为：<code>[protocal:][//]lvmid[@hostname[:port]/servername]</code></li>
+<li>通过interval和count指定查询间隔和次数，option代表用户希望查询的虚拟机信息，分为3类：类装载、垃圾收集、运行期编译状况；常用的有：<code>-class,  -gc, -gcutil,  -gcnew, -gcold</code></li>
+<li>其中，<code>jstat -gcutil vmid</code>的显示结果中，<ul>
+<li>S0， S1两个Survivor区；E是新生代Eden区；O老年代为Old；P表示永久区Permanent；</li>
+<li>YGC程序运行以来Minor GC的次数；FGC表示程序运行以来Full GC的次数；</li>
+<li>FGCT表示Full GC总耗时；所有GC总耗时为GCT</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>jinfo：Java配置信息工具—Configuration Info For Java<ul>
+<li>实时查看和调整虚拟机各项参数，通过jps -v可以看到VM启动时显式指定的参数列表；查看默认值，则需要<code>jinfo -flag</code></li>
+<li>命令格式：<code>jinfo [option] pid</code></li>
+</ul>
+</li>
+<li>jmap：Java内存映像工具<ul>
+<li>用于生成堆转储快照（heapdump或dump文件），命令格式：<code>jmap [option] vmid</code></li>
+<li>option选项：-dump:[live, ]生成heapdump；-heap显示java堆详细信息；-histo显示堆中对象的统计信息；-permstat显示永久内存状态；-F强制生成dump快照</li>
+</ul>
+</li>
+<li>jhat：虚拟机堆转储快照分析工具<ul>
+<li>搭配jmap，分析jmap生成的堆转储快照，但是一般用VisualVM使用</li>
+</ul>
+</li>
+<li>jstack：Java堆栈跟踪工具<ul>
+<li><code>jstack [option] vmid</code>生成VM当前时刻的线程快照，定位线程问题，-F强制输出线程堆栈；-l显示关于锁的附加信息；-m调用本地方法可以显示C/C++堆栈</li>
+</ul>
+</li>
+<li>HSDIS：JIT生成代码反汇编<ul>
+<li>HotSpot虚拟机JIT编译代码的反汇编插件，包含在HotSpot虚拟机的源码中</li>
+</ul>
+</li>
+</ol>
+<h4 id="JDK的可视化工具"><a href="#JDK的可视化工具" class="headerlink" title="JDK的可视化工具"></a>JDK的可视化工具</h4><ol>
+<li>JConsole（Java Monitoring and Management Console）Java监视与管理控制台</li>
+<li>VisualVM：All-in-one Java Troubleshooting Tool多合一故障处理工具</li>
+</ol>
+<h3 id="调优案例分析与实战"><a href="#调优案例分析与实战" class="headerlink" title="调优案例分析与实战"></a>调优案例分析与实战</h3><h4 id="案例分析"><a href="#案例分析" class="headerlink" title="案例分析"></a>案例分析</h4><ol>
+<li>由Windows虚拟内存导致的长时间停顿<ul>
+<li>程序最小化时，它的工作内存被自动交换到磁盘的页面文件之中</li>
+<li>用：<code>-Dsun.awt.keepWorkingSetOnMinimize=true</code></li>
+</ul>
+</li>
+<li>不恰当数据结构导致内存占用过大<ul>
+<li>用HashMap存储大量数据，空间效率太低；新生代对象使用复制算法暂停时间明显过长</li>
+<li>可以考虑将Survivor空间去掉，用<code>-XX: SurvivorRatio=65536 -XX: MaxTenuringThreshold=0或者-XX: +AlwaysTenure</code>，让新生代中存活的对象在第一Minor GC后立即进入老年代，等到Major GC时再清理（治标）</li>
+</ul>
+</li>
+<li>服务器JVM进程崩溃<ul>
+<li>远端连接异常，使用异步方式调用web服务，两边服务速度完全不对等，时间越长累积越多调用，导致在等待的线程和Socket连接越来越多，导致超过JVM的承受能力后崩溃</li>
+<li>将异步调用改为生产者/消费者模式的消息队列</li>
+</ul>
+</li>
+<li>外部命令导致系统缓慢<ul>
+<li>用本地方法执行shell脚本，在JVM中非常消耗资源，因为在频繁调用时会创建进程：首先克隆一个和当前VM一样环境变量的进程；再用这个新进程来执行外部命令；最后推出这个进程</li>
+<li>改用Java的API，去掉Shell脚本执行</li>
+</ul>
+</li>
+<li>堆外内存导致的溢出错误<ul>
+<li>Direct Memory内存不算入堆，只能使用分配给JVM的内存减去堆内存后的堆外内存；虚拟机对Direct Memory的回收需要等待Full GC</li>
+<li>通过<code>-XX: MaxDirectMemorySize</code>调整大小，内存不足时抛出<code>OutOfMemoryError</code>；线程堆栈不足是通过-Xss调整大小，抛出<code>StackOverflowError</code>或者<code>OutOfMemoryError</code>；Socket缓存区内存可以抛出<code>IOException: Too many open files</code></li>
+</ul>
+</li>
+<li>集群间同步导致的内存溢出<ul>
+<li>集群间通信数据过多，并且会缓存发出的消息，积累重发数据，导致了内存溢出</li>
+</ul>
+</li>
+<li>高性能硬件上的程序部署策略<ul>
+<li>部署方式<ul>
+<li>使用64未JDK：但性能普遍低于32位</li>
+<li>若干个32位虚拟机建立逻辑集群利用硬件资源</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="实战：Eclipse运行速度调优"><a href="#实战：Eclipse运行速度调优" class="headerlink" title="实战：Eclipse运行速度调优"></a>实战：Eclipse运行速度调优</h4><ol>
+<li>调优前的程序运行状态</li>
+<li>升级JDK1.6的性能变化以及兼容问题</li>
+<li>编译时间和类加载时间优化</li>
+<li>调整内存设置控制案例收集频率</li>
+<li>选择收集器降低延迟</li>
+</ol>
+<blockquote>
+<p><strong>JDK8将PermSize永生代（JDK7及以前）用MetaSpace元空间来代替</strong></p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag"># jvm</a>
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/java/jvm/垃圾收集与内存分配策略/" rel="next" title="垃圾收集与内存分配策略">
+                <i class="fa fa-chevron-left"></i> 垃圾收集与内存分配策略
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/java/jvm/虚拟机执行子系统/" rel="prev" title="虚拟机执行子系统">
+                虚拟机执行子系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/04/21/java/jvm/JVM内存分配与回收理论实践/"
+           data-title="垃圾收集与内存分配策略" data-url="http://yoursite.com/2019/04/21/java/jvm/JVM内存分配与回收理论实践/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">znewcradle</p>
+              <p class="site-description motion-element" itemprop="description">This is a website to show my blogs</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/znewcradle" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JVM内存分配与回收理论实践"><span class="nav-number">1.</span> <span class="nav-text">JVM内存分配与回收理论实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟机性能监控与故障处理工具"><span class="nav-number">1.1.</span> <span class="nav-text">虚拟机性能监控与故障处理工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#概述"><span class="nav-number">1.1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JDK命令行工具"><span class="nav-number">1.1.2.</span> <span class="nav-text">JDK命令行工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#JDK的可视化工具"><span class="nav-number">1.1.3.</span> <span class="nav-text">JDK的可视化工具</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调优案例分析与实战"><span class="nav-number">1.2.</span> <span class="nav-text">调优案例分析与实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#案例分析"><span class="nav-number">1.2.1.</span> <span class="nav-text">案例分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实战：Eclipse运行速度调优"><span class="nav-number">1.2.2.</span> <span class="nav-text">实战：Eclipse运行速度调优</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">znewcradle</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

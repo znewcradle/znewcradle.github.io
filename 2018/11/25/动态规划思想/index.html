@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="动态规划总结动态规划求解的一般思路：  判断问题的子结构，当具有最优子结构时，动态规划可能适用 求解重叠子问题，一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。 重新构造一个最优解  1.硬币找零难度评级：★ 　　假设有几种硬币，如1、3、5，并且数量无限。请找出能够组成某个数目的找零所使用最少的硬币数。  2.字符串相似度/编辑距离（edit distance）难度评级：★">
+<meta name="description" content="动态规划总结参考链接：  https://pks-loving.blog.luogu.org/junior-dynamic-programming-dong-tai-gui-hua-chu-bu-ge-zhong-zi-xu-lie https://www.zhihu.com/question/23995189?utm_source=com.microsoft.launcher&amp;amp;utm_m">
 <meta name="keywords" content="algorithm,dynamic programming,algo-summary">
 <meta property="og:type" content="article">
 <meta property="og:title" content="动态规划思想">
 <meta property="og:url" content="http://yoursite.com/2018/11/25/动态规划思想/index.html">
 <meta property="og:site_name" content="Znewradle&#39;s blog">
-<meta property="og:description" content="动态规划总结动态规划求解的一般思路：  判断问题的子结构，当具有最优子结构时，动态规划可能适用 求解重叠子问题，一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。 重新构造一个最优解  1.硬币找零难度评级：★ 　　假设有几种硬币，如1、3、5，并且数量无限。请找出能够组成某个数目的找零所使用最少的硬币数。  2.字符串相似度/编辑距离（edit distance）难度评级：★">
+<meta property="og:description" content="动态规划总结参考链接：  https://pks-loving.blog.luogu.org/junior-dynamic-programming-dong-tai-gui-hua-chu-bu-ge-zhong-zi-xu-lie https://www.zhihu.com/question/23995189?utm_source=com.microsoft.launcher&amp;amp;utm_m">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-24T11:20:21.350Z">
+<meta property="og:updated_time" content="2019-03-07T12:45:17.974Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="动态规划思想">
-<meta name="twitter:description" content="动态规划总结动态规划求解的一般思路：  判断问题的子结构，当具有最优子结构时，动态规划可能适用 求解重叠子问题，一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。 重新构造一个最优解  1.硬币找零难度评级：★ 　　假设有几种硬币，如1、3、5，并且数量无限。请找出能够组成某个数目的找零所使用最少的硬币数。  2.字符串相似度/编辑距离（edit distance）难度评级：★">
+<meta name="twitter:description" content="动态规划总结参考链接：  https://pks-loving.blog.luogu.org/junior-dynamic-programming-dong-tai-gui-hua-chu-bu-ge-zhong-zi-xu-lie https://www.zhihu.com/question/23995189?utm_source=com.microsoft.launcher&amp;amp;utm_m">
 
 
 
@@ -363,35 +363,44 @@
       
 
       
-        <h3 id="动态规划总结"><a href="#动态规划总结" class="headerlink" title="动态规划总结"></a>动态规划总结</h3><p>动态规划求解的一般思路：</p>
+        <h3 id="动态规划总结"><a href="#动态规划总结" class="headerlink" title="动态规划总结"></a>动态规划总结</h3><p>参考链接：</p>
+<ul>
+<li><a href="https://pks-loving.blog.luogu.org/junior-dynamic-programming-dong-tai-gui-hua-chu-bu-ge-zhong-zi-xu-lie" target="_blank" rel="external">https://pks-loving.blog.luogu.org/junior-dynamic-programming-dong-tai-gui-hua-chu-bu-ge-zhong-zi-xu-lie</a></li>
+<li><a href="https://www.zhihu.com/question/23995189?utm_source=com.microsoft.launcher&amp;utm_medium=social&amp;utm_oi=719823168826523648" target="_blank" rel="external">https://www.zhihu.com/question/23995189?utm_source=com.microsoft.launcher&amp;utm_medium=social&amp;utm_oi=719823168826523648</a></li>
+</ul>
+<p>动态规划求解的一般思路：</p>
 <ol>
 <li>判断问题的子结构，当具有最优子结构时，动态规划可能适用</li>
 <li>求解重叠子问题，一个递归算法不断地调用同一问题，递归可以转化为查表从而利用子问题的解。</li>
 <li>重新构造一个最优解</li>
 </ol>
-<h1 id="1-硬币找零"><a href="#1-硬币找零" class="headerlink" title="1.硬币找零"></a>1.硬币找零</h1><p>难度评级：★</p>
-<p>　　假设有几种硬币，如1、3、5，并且数量无限。请找出能够组成某个数目的找零所使用最少的硬币数。 </p>
-<h1 id="2-字符串相似度-编辑距离（edit-distance）"><a href="#2-字符串相似度-编辑距离（edit-distance）" class="headerlink" title="2.字符串相似度/编辑距离（edit distance）"></a>2.字符串相似度/编辑距离（edit distance）</h1><p>难度评级：★</p>
-<p>　　对于序列S和T，它们之间距离定义为：对二者其一进行几次以下的操作(1)删去一个字符；(2)插入一个字符；(3)改变一个字符。每进行一次操作，计数增加1。将S和T变为同一个字符串的最小计数即为它们的距离。给出相应算法。</p>
-<h1 id="3-最长公共子序列-Longest-Common-Subsequence-lcs"><a href="#3-最长公共子序列-Longest-Common-Subsequence-lcs" class="headerlink" title="3.最长公共子序列(Longest Common Subsequence,lcs)"></a>3.最长公共子序列(Longest Common Subsequence,lcs)</h1><p>难度评级：★</p>
-<p>　　对于序列S和T，求它们的最长公共子序列。例如X={A,B,C,B,D,A,B}，Y={B,D,C,A,B,A}则它们的lcs是{B,C,B,A}和{B,D,A,B}。求出一个即可。</p>
-<h1 id="4-最长递增子序列（Longest-Increasing-Subsequence-lis）"><a href="#4-最长递增子序列（Longest-Increasing-Subsequence-lis）" class="headerlink" title="4.最长递增子序列（Longest Increasing Subsequence,lis）"></a>4.最长递增子序列（Longest Increasing Subsequence,lis）</h1><p>难度评级：★</p>
-<p> 　　对于一个序列如1，-1，2，-3，4，-5，6，-7，其最长第增子序列为1,2,4,6。</p>
-<h1 id="5-最大连续子序列和-积"><a href="#5-最大连续子序列和-积" class="headerlink" title="5.最大连续子序列和/积"></a>5.最大连续子序列和/积</h1><p>难度评级：★</p>
-<p>　　输入是具有n个数的向量x，输出时输入向量的任何连续子向量的最大和。</p>
-<h1 id="6-矩阵链乘法"><a href="#6-矩阵链乘法" class="headerlink" title="6.矩阵链乘法"></a>6.矩阵链乘法</h1><p>难度评级：★</p>
-<p>　　一个给定的矩阵序列A1A2…An计算连乘乘积，有不同的结合方法，并且在结合时，矩阵的相对位置不能改变，只能相邻结合。根据矩阵乘法的公式，10<em>100和100</em>5的矩阵相乘需要做10<em>100</em>5次标量乘法。那么对于维数分别为10<em>100、100</em>5、5<em>50的矩阵A、B、C，用(A</em>B)<em>C来计算需要10</em>100<em>5 + 10</em>5<em>500 =7500次标量乘法；而A</em>(B<em>C)则需要100</em>5<em>50+10</em>100*50=75000次标量乘法。</p>
-<p>　　那么对于由n个矩阵构成的链<a1,a2,...,an>，对i-1,2,…n，矩阵Ai的维数为pi-1*pi，对乘积A1A2…An求出最小化标量乘法的加括号方案。</a1,a2,...,an></p>
-<h1 id="7-0-1背包"><a href="#7-0-1背包" class="headerlink" title="7.0-1背包"></a>7.0-1背包</h1><p>难度评级：★★</p>
-<p>　　一个贼在偷窃一家商店时发现了n件物品，其中第i件值vi元，重wi磅。他希望偷走的东西总和越值钱越好，但是他的背包只能放下W磅。请求解如何放能偷走最大价值的物品，这里vi、wi、W都是整数。</p>
-<h1 id="8-有代价的最短路径"><a href="#8-有代价的最短路径" class="headerlink" title="8.有代价的最短路径"></a>8.有代价的最短路径</h1><p>难度评级：★★★</p>
-<p>　　无向图G中有N个顶点，并通过一些边相连接，边的权值均为正数。初始时你身上有M元，当走过i点时，需要支付S(i)元，如果支付不起表示不能通过。请找出顶点1到顶点N的最短路径。如果不存在则返回一个特殊值，如果存在多条则返回最廉价的一条。限制条件：1&lt;N&lt;=100; 0&lt;=M&lt;=100 ; 对任意i, 0&lt;=S[i]&lt;=100。</p>
-<h1 id="9-瓷砖覆盖（状态压缩DP）"><a href="#9-瓷砖覆盖（状态压缩DP）" class="headerlink" title="9.瓷砖覆盖（状态压缩DP）"></a>9.瓷砖覆盖（状态压缩DP）</h1><p>难度评级：★★★</p>
-<p>　　用 1 <em> 2 的瓷砖覆盖 n </em> m 的地板，问共有多少种覆盖方式？</p>
-<h1 id="10-工作量划分"><a href="#10-工作量划分" class="headerlink" title="10.工作量划分"></a>10.工作量划分</h1><p>难度评级：★★</p>
-<p>　　假设书架上一共有9本书，每本书各有一定的页数，分配3个人来进行阅读。为了便于管理，分配时，各书要求保持连续，比如第1、2、3本书分配给第1人，4、5分配给第二人，6，7，8，9分配给第3人，但不能1，4，2分配给第1人，3，5，6分配给第2人。即用两个隔板插入8个空隙中将9本书分成3部分，书不能换位。同时，分配时必须整本分配，同一本书不能拆成两部分分给两个人。为了公平起见，需要将工作量最大的那一部分最小化，请设计分配方案。用s1,…,sn表示各本书的页数。</p>
-<h1 id="11-三次捡苹果"><a href="#11-三次捡苹果" class="headerlink" title="11.三次捡苹果"></a>11.三次捡苹果</h1><p>难度评级：★★★</p>
-<p>　　（问题1的相关问题(1)的进一步扩展）一个矩形区域被划分为N*M个小矩形格子，在格子(i,j)中有A[i][j]个苹果。现在从左上角的格子(1,1)出发，要求每次只能向右走一步或向下走一步，每经过一个格子就把其中的苹果全部拿走，最后到达(N,M)。此时，只允许向上或向左走一步，反方向走回(1,1)。这一趟可以不走第一趟的路线，但当经过第一趟所经过的格子时，里面已经没有苹果了。到达(1,1)后，再次反方向地只允许向右或向下走，走到(N,M)，同样可以不走前两趟走过的路线。求这三趟的走法，使得最终能拿取最多数量的苹果。</p>
+<h5 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h5><ol>
+<li>与贪心策略的区别：贪心策略值考虑眼前的情况；动态规划会考虑下一步的值；</li>
+<li>与暴力的区别：暴力求解的解空间往往非常大，基本上所有可能解；动态规划则自带剪枝，避免求解冗余信息</li>
+</ol>
+<p>每个阶段只有一个状态  -&gt; 递推；</p>
+<p>每个阶段的最优状态都是又上一阶段的最优状态得到的 -&gt;  贪心</p>
+<p>每个阶段的最优状态是由之前所有阶段的状态的组合得到的 -&gt; 搜索</p>
+<p>每个阶段的最优状态可以从之前某个或者某些状态直接得到而不管之前这个状态是如何得到的 -&gt; 动态规划</p>
+<h5 id="动态规划：将一个问题拆成几个子问题，分别求解这些子问题，即可推断出大问题的解"><a href="#动态规划：将一个问题拆成几个子问题，分别求解这些子问题，即可推断出大问题的解" class="headerlink" title="动态规划：将一个问题拆成几个子问题，分别求解这些子问题，即可推断出大问题的解"></a>动态规划：将一个问题拆成几个子问题，分别求解这些子问题，即可推断出大问题的解</h5><blockquote>
+<p>一言以蔽之：大事化小，小事化了</p>
+</blockquote>
+<h5 id="重要的性质："><a href="#重要的性质：" class="headerlink" title="重要的性质："></a>重要的性质：</h5><ol>
+<li>无后效性：在给定某一阶段的状态后，则在这一阶段以后过程的发展不受这阶段以前各阶段状态的影响；</li>
+<li>最优子结构：大问题的最优解可以由小问题的最优解推出；</li>
+</ol>
+<h5 id="如何判断一个问题是否能用DP来解决："><a href="#如何判断一个问题是否能用DP来解决：" class="headerlink" title="如何判断一个问题是否能用DP来解决："></a>如何判断一个问题是否能用DP来解决：</h5><ol>
+<li>能够将大问题拆成几个小问题；</li>
+<li>满足无后效性：求解f(n)只需要求解f(n-1)和f(n-2)，但是f(n-1)和f(n-2)的求解过程不影响对求解f(n)不造成影响，只需要知道其值即可 —— 当前状态会且仅会决策出下一状态，而不直接对未来的所有状态负责（Future never has to do with past time, but present does.）</li>
+<li>最优子结构性质；（可以通过反证法归谬来证明，如果有一步不是最优子结构，那么就能找到比当前结果更优的解，与题设矛盾）——  类似递推，但是针对状态操作</li>
+</ol>
+<h5 id="动态规划算法设计"><a href="#动态规划算法设计" class="headerlink" title="动态规划算法设计"></a>动态规划算法设计</h5><p>通用步骤：</p>
+<ol>
+<li>将当前面对的局面记为x —— <strong>设计状态</strong>（我是谁）</li>
+<li>对于状态x，记当前局面求解为f(x)，目标是求出f(T)</li>
+<li>找出f(x)与哪些局面有关，记为p，可以得到状态转移方程：通过f(p)来推出f(x)</li>
+</ol>
+<p>关键在于<strong>状态转移方程</strong>，可以通过“我从哪里来”（pull型转移）或“我要到哪里去”（push型转移）来解决</p>
 
       
     </div>
@@ -435,6 +444,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/02/算法设计思想之贪婪算法/" rel="prev" title="算法设计思想">
+                算法设计思想 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -518,7 +531,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -529,7 +542,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -540,7 +553,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -583,7 +596,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态规划总结"><span class="nav-number">1.</span> <span class="nav-text">动态规划总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-硬币找零"><span class="nav-number"></span> <span class="nav-text">1.硬币找零</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-字符串相似度-编辑距离（edit-distance）"><span class="nav-number"></span> <span class="nav-text">2.字符串相似度/编辑距离（edit distance）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-最长公共子序列-Longest-Common-Subsequence-lcs"><span class="nav-number"></span> <span class="nav-text">3.最长公共子序列(Longest Common Subsequence,lcs)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-最长递增子序列（Longest-Increasing-Subsequence-lis）"><span class="nav-number"></span> <span class="nav-text">4.最长递增子序列（Longest Increasing Subsequence,lis）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-最大连续子序列和-积"><span class="nav-number"></span> <span class="nav-text">5.最大连续子序列和/积</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-矩阵链乘法"><span class="nav-number"></span> <span class="nav-text">6.矩阵链乘法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-0-1背包"><span class="nav-number"></span> <span class="nav-text">7.0-1背包</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-有代价的最短路径"><span class="nav-number"></span> <span class="nav-text">8.有代价的最短路径</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-瓷砖覆盖（状态压缩DP）"><span class="nav-number"></span> <span class="nav-text">9.瓷砖覆盖（状态压缩DP）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-工作量划分"><span class="nav-number"></span> <span class="nav-text">10.工作量划分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#11-三次捡苹果"><span class="nav-number"></span> <span class="nav-text">11.三次捡苹果</span></a></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态规划总结"><span class="nav-number">1.</span> <span class="nav-text">动态规划总结</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#区别"><span class="nav-number">1.0.1.</span> <span class="nav-text">区别</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#动态规划：将一个问题拆成几个子问题，分别求解这些子问题，即可推断出大问题的解"><span class="nav-number">1.0.2.</span> <span class="nav-text">动态规划：将一个问题拆成几个子问题，分别求解这些子问题，即可推断出大问题的解</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#重要的性质："><span class="nav-number">1.0.3.</span> <span class="nav-text">重要的性质：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#如何判断一个问题是否能用DP来解决："><span class="nav-number">1.0.4.</span> <span class="nav-text">如何判断一个问题是否能用DP来解决：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#动态规划算法设计"><span class="nav-number">1.0.5.</span> <span class="nav-text">动态规划算法设计</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -603,7 +616,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

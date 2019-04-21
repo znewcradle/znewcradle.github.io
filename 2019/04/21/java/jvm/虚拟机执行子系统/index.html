@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="jvm,java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="虚拟机执行子系统类文件结构无关性的基石 语言无关性的基础是：虚拟机和字节码存储格式；  JVM与语言无关，只与Class文件特定的二进制文件格式所关联  Class文件中包含了JVM指令集和符号表以及若干辅助信息     Class类文件的结构 任何一个Class文件都对应着唯一一个类或接口的定义信息（磁盘中）；但是类或接口并不一定都需定义在文件中（可以通过类加载器直接生成，在内存中） Class">
+<meta name="keywords" content="jvm,java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟机执行子系统">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/java/jvm/虚拟机执行子系统/index.html">
+<meta property="og:site_name" content="Znewradle&#39;s blog">
+<meta property="og:description" content="虚拟机执行子系统类文件结构无关性的基石 语言无关性的基础是：虚拟机和字节码存储格式；  JVM与语言无关，只与Class文件特定的二进制文件格式所关联  Class文件中包含了JVM指令集和符号表以及若干辅助信息     Class类文件的结构 任何一个Class文件都对应着唯一一个类或接口的定义信息（磁盘中）；但是类或接口并不一定都需定义在文件中（可以通过类加载器直接生成，在内存中） Class">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T02:53:00.985Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="虚拟机执行子系统">
+<meta name="twitter:description" content="虚拟机执行子系统类文件结构无关性的基石 语言无关性的基础是：虚拟机和字节码存储格式；  JVM与语言无关，只与Class文件特定的二进制文件格式所关联  Class文件中包含了JVM指令集和符号表以及若干辅助信息     Class类文件的结构 任何一个Class文件都对应着唯一一个类或接口的定义信息（磁盘中）；但是类或接口并不一定都需定义在文件中（可以通过类加载器直接生成，在内存中） Class">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/java/jvm/虚拟机执行子系统/"/>
+
+
+
+
+
+  <title>虚拟机执行子系统 | Znewradle's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Znewradle's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/java/jvm/虚拟机执行子系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="znewcradle">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Znewradle's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">虚拟机执行子系统</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T10:48:34+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/21/java/jvm/虚拟机执行子系统/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/21/java/jvm/虚拟机执行子系统/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="虚拟机执行子系统"><a href="#虚拟机执行子系统" class="headerlink" title="虚拟机执行子系统"></a>虚拟机执行子系统</h2><h3 id="类文件结构"><a href="#类文件结构" class="headerlink" title="类文件结构"></a>类文件结构</h3><h4 id="无关性的基石"><a href="#无关性的基石" class="headerlink" title="无关性的基石"></a>无关性的基石</h4><ol>
+<li><p>语言无关性的基础是：虚拟机和字节码存储格式；</p>
+<ul>
+<li><p>JVM与语言无关，只与Class文件特定的二进制文件格式所关联</p>
+</li>
+<li><p>Class文件中包含了JVM指令集和符号表以及若干辅助信息</p>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="Class类文件的结构"><a href="#Class类文件的结构" class="headerlink" title="Class类文件的结构"></a>Class类文件的结构</h4><ol>
+<li>任何一个Class文件都对应着唯一一个类或接口的定义信息（磁盘中）；但是类或接口并不一定都需定义在文件中（可以通过类加载器直接生成，在内存中）<ul>
+<li>Class文件是一组以8字节为基础单位的二进制流；</li>
+<li>数据项目严格按照顺序紧凑排列在Class文件之中，中间没有分隔符；（存储的内容几乎全是程序运行的必要数据，没有空隙，格式严格限定）</li>
+<li>8位字节以上空间的数据项，会按照高位在前的方式分割成若干个8位字节进行存储</li>
+<li>Class文件格式（类似C语言结构体的伪结构）只有两种数据类型：无符号数和表<ul>
+<li>无符号数：基本数据类型，用u1, u2, u4, u8表示1，2，4，8个字节无符号数；可用来描述数字、索引引用、数量值以及按照UTF-8编码构成字符串值</li>
+<li>表：多个无符号数或其他表作为数据项构成的复合数据类型，习惯性用_info结尾（描述有层次关系的复合结构的数据，整个Class文件本质上是一张表）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>魔数与Class文件的版本<ul>
+<li>Class文件的头4个字节称为魔数，确定该文件是否能偶被虚拟机接受（并非使用文件扩展名来识别文件，鉴于扩展名可以随意改动），Java的魔数是：<code>0xCAFEBABE</code></li>
+<li>第5和6个字节是Class文件的次版本号，第7和8个字节是主版本号，（JDK版本号从45开始，如JDK1.0-11使用了45.0-45.3的版本号），高版本的JDK能够向下兼容低版本Class文件，反之则不行</li>
+</ul>
+</li>
+<li>常量池<ul>
+<li>紧接着版本号之后是常量池入口——Class文件之中的资源仓库（Class文件结构中与其他项目相关联最多的数据类型，占用Class文件空间最大的数据项目之一，Class文件中第一个出现的表类型数据项目）</li>
+<li>常量池入口放置u2类型数据达标常量池容量的计数值（计数从1开始），第0项常量用于满足某些指向常量池的索引值的数据需要表达不引用任何一个常量池项目；<strong>其他集合类型则从0开始</strong></li>
+<li>主要存放：<strong>字面量和符号引用</strong><ul>
+<li>字面量：近似于常量，如字符串，final常量等</li>
+<li>符号引用：类和接口的全限定名、字符的名称和描述符、方法的名称和描述符</li>
+</ul>
+</li>
+<li>JVM在加载Class文件时进行动态连接，Class文件不会保存各个方法、字段的最终内存布局信息；常量池中每一项常量都是一个表，共有14中类型（JDK7之前是11种）<ul>
+<li>UTF-8编码字符串，整型字面量、浮点型字面量</li>
+<li>长整型字面量、双精度浮点型字面量、表示方法的句柄、标识方法类型等</li>
+</ul>
+</li>
+<li>计算常量池的常量以及常量项的结构</li>
+</ul>
+</li>
+<li>访问标志<ul>
+<li>常量池结束后，紧接着的两个字节为访问标志(access_flags)，用于识别一些类或者接口层次的访问信息<ul>
+<li>类或者接口</li>
+<li>是否为public类</li>
+<li>是否为abstract类型</li>
+<li>如果是类是否被声明为final等</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>类索引、父类索引与接口索引集合<ul>
+<li>类索引和父类索引均为u2类型数据，接口索引集合是一组u2类型的数据集合；Class文件中由这三项数据来确定类的集成关系；<ul>
+<li>类索引：确定类的全限定名</li>
+<li>父类索引：确定类的父类的全限定名（除了java.lang.Object之外，所有Java类的父类索引都不为0）</li>
+<li>接口索引集合：描述这个类实现的接口集合，按顺序从左到右</li>
+<li>类索引和父类索引两个u2类型索引各自指向一个类型为<code>CONSTANT_Class_info</code>的类描述符常量，通过<code>CONSTANT_Class_info</code>类型 的常量中的索引值可以找到定义在<code>CONSTANT_Utf8_info</code>类型的常量中的全限定名字符串</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>字段表集合<ul>
+<li>用于描述接口或者类中声明的变量，包括类级变量 +　实例级变量（不包括方法中定义的局部变量）</li>
+<li>字段表结构中包含了字段：<code>access_flags(访问权限、可变性和并发可见性), name_index（常量池引用，字段的简单名称）, attributes, attributes_count, descriptor_index（字段和方法的描述符）</code></li>
+<li>字段表集合不会列出从超类或者父接口中继承而来的字段</li>
+</ul>
+</li>
+<li>方法表集合<ul>
+<li>存储对方法的描述和对字段的描述几乎一致；包括：访问标志、名称索引、描述符索引、属性表集合</li>
+<li>子类没有重写的父类方法不出现，但是可能会出现编译器自动添加的方法，典型的如：<code>&lt;clinit&gt;和&lt;init&gt;</code></li>
+</ul>
+</li>
+<li>属性表集合<ul>
+<li>VM规范中预定义的属性，每个属性其名称需要从引用常量池<code>CONSTANT_Utf8_info</code>类型的常量来表示，属性值的结构则完全自定义，只需要通过u4的长度属性说明属性值所占用的位数</li>
+<li>Code属性：存储方法体中的代码经Javac编译处理后的字节码，接口或抽象类中的方法则不存在<ul>
+<li><code>attribute_name_index</code>：指向<code>CONSTANT_Utf8_info</code>型常量的索引，常量值固定为”Code”，<code>attribute_length</code>指示属性值的长度。</li>
+<li><code>max_stack</code>代表操作数栈深度的最大值，方法执行的任意时刻操作数栈都不会超过该深度</li>
+<li><code>max_locals</code>代表局部变量表所需的存储空间，其单位为Slot（虚拟机为局部变量分配内存所使用的最小单位，除了long和double需2个Slot，其余都是1个Slot）。存储方法参数、显式异常处理器参数、方法体中定义的局部变量；所有之和为<code>max_locals</code>。局部变量表中的Slot可以重用，故Javac会根据变量的作用域来分配Slot来给各个变量使用</li>
+<li><code>code_length</code>和code用来存储编译后的字节码指令；每个指令是u1类型的单字节（JVM定义了约200条编码值对应的指令含义）；<code>code_length</code>是一个u4，但明确限制方法不允许超过65535条字节指令</li>
+<li>实例方法通过this访问对象，是通过方法进行的，因此在实例方法的局部变量表中至少会存在一个指向当前对象实例的局部变量</li>
+<li>字节码指令后是方法的显式异常处理表集合（并非必须），编译器使用异常表而不是简单的跳转命令来实现Java异常及finally处理机制</li>
+</ul>
+</li>
+<li>Exceptions属性<ul>
+<li>与异常表不同，意在列举出方法中可能抛出的受查异常（方法描述时在throws关键字后列出的异常）</li>
+<li>Exceptions属性表</li>
+</ul>
+</li>
+<li><code>LineNumberTable</code>属性<ul>
+<li>描述Java源码行号与字节码行号（字节码偏移量）之间对应关系</li>
+<li>通过<code>-g:none/ -g:lines</code>来取消或显示</li>
+</ul>
+</li>
+<li><code>LocalVariableTable</code>属性<ul>
+<li>用于描述栈帧中局部变量表中的变量与Java源码中定义的变量之间的关系</li>
+<li>通过<code>-g:noe/ -g:vars</code>来取消或显示</li>
+</ul>
+</li>
+<li><code>SourceFile</code>属性：记录生成这个Class文件的源码文件名称</li>
+<li><code>ConstantValue</code>属性：通知虚拟机自动为静态变量赋值，只有static修饰的变量会使用到</li>
+<li><code>InnerClasses</code>属性：记录内部类与宿主类之间的关联</li>
+<li><code>Deprecated</code>及<code>Synthetic</code>属性都属于标志类型的布尔属性，<ul>
+<li><code>Deprecated</code>用于表示某个类、字段或者方法，已经被程序作者定位不再推荐使用</li>
+<li><code>Synthetic</code>属性代表此字段或者方法并不由Java源码直接产生，而是由编译器自行添加</li>
+</ul>
+</li>
+<li><code>StackMapTable</code>属性：变长属性，在Code属性的属性表中，在虚拟机类加载的字节码验证阶段被新类型检查验证器使用</li>
+<li><code>Signature</code>属性：记录泛型签名信息，为了弥补擦除后，能够在运行期反射时获得泛型信息（JDK1.5之后）</li>
+<li><code>BootstrapMethods</code>属性：变长属性，用于保存<code>invokedynamic</code>指令引用的引导方法限定符</li>
+</ul>
+</li>
+</ol>
+<h4 id="字节码指令简介"><a href="#字节码指令简介" class="headerlink" title="字节码指令简介"></a>字节码指令简介</h4><ol>
+<li>JVM指令由操作码（OpCode, 一个字节） + 操作数（Operands, 0-n）；大多数指令不包含操作数，只有一个操作码<ul>
+<li>字节码指令集中，操作码一个字节总数不超过256条；</li>
+<li>Class文件格式放弃了编译后代码的操作数长度对齐，故而超过一个字节的数据时需要从字节中重建出具体数据的结构（虽然损失性能但是编译后代码精干，传输效率高）</li>
+</ul>
+</li>
+<li>字节码与数据类型<ul>
+<li>指令集中大多数指令包含其操作所对应的数据类型，如：<code>iload--int</code>，<code>fload--float</code></li>
+<li>有限的指令集长度使得其<strong>只针对有限的类型提供相关指令支持</strong>，必要时需将不支持的 类型转换为可被支持的类型（如，将byte, char和short和boolean扩展为相应的int类型数据）</li>
+<li>加载和存储指令：用于将数据在栈帧中的局部变量表和操作数栈之间来回传输<ul>
+<li>将一个局部变量加载到操作栈中：load</li>
+<li>将一个数值从操作数栈存储到局部变量表：store</li>
+<li>将一个常量加载到操作数栈：push</li>
+<li>扩充局部变量表的访问索引的指令：wide</li>
+</ul>
+</li>
+<li>运算指令：用于对两个操作数栈上的值进行某种特定运算，并把结果重新存入到操作栈顶；大体上分为： 对整型数据(char, short, int, boolean)/ 浮点型 数据进行运算的指令<ul>
+<li>加add；减sub；乘mul；除div；</li>
+<li>求余div；取反neg；位移shl；</li>
+<li>按位或or；按位与and；按位异或xor；</li>
+<li>局部变量自增：iinc；</li>
+<li>比较指令：<code>dcmpg, dcmpl, fcmpg, fcmpl, lcmp</code></li>
+<li>(只有除法和求余才会出现ArithmeticException；浮点数转换为整数时直接导致数字被截断)</li>
+</ul>
+</li>
+<li>类型转换指令：不同数值类型进行相互转换，直接支持宽化类型转换（安全转换）；窄化类型转换必须使用显式转换指令（可能会导致转换结果产生不同的正负号、不同数量级）<ul>
+<li>数据类型窄化转换会导致上限溢出、下限溢出和精度丢失等，但是JVM不会抛出运行时异常</li>
+</ul>
+</li>
+<li>对象创建与访问指令：<ul>
+<li>创建类实例的指令：new</li>
+<li>创建数组的 指令：newarray, anewarray, multianewarray</li>
+<li>访问类字段和实例字段的指令：getfield, putfield, getstatic, putstatic</li>
+<li>将一个数组元素加载到操作数栈的指令：(x)load</li>
+<li>将一个数组元素的值存储到数组元素中的指令:  (x)store</li>
+<li>取数组长度的指令： arraylength</li>
+<li>检查类实例类型的指令： instanceof,  checkcast</li>
+</ul>
+</li>
+<li>操作数栈管理指令：如同操作一个普通数据结构中的堆栈一样，如出栈、压栈和互换栈顶的两个元素</li>
+<li>控制转移指令：条件分支(if)、复合条件分支(tableswitch)、无条件分支(goto, jsr)</li>
+<li>方法调用和返回指令：<ul>
+<li>invokevirtual指令用于调用对象的实例方法，根据对象的实际类型进行分派（虚方法分<br>派），这也是Java语言中最常见的方法分派方式。</li>
+<li>invokeinterface指令用于调用接口方法，它会在运行时搜索一个实现了这个接口方法的对象，找出适合的方法进行调用。</li>
+<li>invokespecial指令用于调用一些需要特殊处理的实例方法，包括实例初始化方法、私有方法和父类方法。</li>
+<li>invokestatic指令用于调用类方法（static方法）</li>
+<li>invokedynamic指令用于在运行时动态解析出调用点限定符所引用的方法，并执行该方<br>法，前面4条调用指令的分派逻辑都固化在Java虚拟机内部，而invokedynamic指令的分派逻辑是由用户所设定的引导方法决定的。</li>
+<li>方法返回指令根据返回值的类型区分，有：<code>ireturn, lreturn, freturn, dreturn和areturn</code></li>
+</ul>
+</li>
+<li>异常处理指令：显式抛出异常athrow指令；并规定了许多运行时异常会在JVM检测到异常状况时自动抛出；处理异常（catch语句）用异常表来完成</li>
+<li>同步指令：JVM支持方法级同步和方法内部一段指令序列的同步，两种都是管程<ul>
+<li>方法级同步是隐式的，通过<code>ACC_SYNCHRONIZED</code>访问标志得知是否为同步方法，如果设置要求成功持有管程才能执行</li>
+<li>指令集序列由synchronized语句块表示，JVM提供指令<code>monitorenter和monitorexit</code>来支持</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="公有设计和私有实现"><a href="#公有设计和私有实现" class="headerlink" title="公有设计和私有实现"></a>公有设计和私有实现</h4><p>在满足公有虚拟机设计规范的基础上，允许对具体实现做出修改和优化；这种伸缩性让JVM可以获得更高性能、更低内存消耗或更好可移植性。</p>
+<h4 id="Class文件结构的发展"><a href="#Class文件结构的发展" class="headerlink" title="Class文件结构的发展"></a>Class文件结构的发展</h4>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag"># jvm</a>
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/java/jvm/JVM内存分配与回收理论实践/" rel="next" title="垃圾收集与内存分配策略">
+                <i class="fa fa-chevron-left"></i> 垃圾收集与内存分配策略
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/java/jvm/虚拟机类加载机制/" rel="prev" title="虚拟机类加载机制">
+                虚拟机类加载机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/04/21/java/jvm/虚拟机执行子系统/"
+           data-title="虚拟机执行子系统" data-url="http://yoursite.com/2019/04/21/java/jvm/虚拟机执行子系统/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">znewcradle</p>
+              <p class="site-description motion-element" itemprop="description">This is a website to show my blogs</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/znewcradle" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟机执行子系统"><span class="nav-number">1.</span> <span class="nav-text">虚拟机执行子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类文件结构"><span class="nav-number">1.1.</span> <span class="nav-text">类文件结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#无关性的基石"><span class="nav-number">1.1.1.</span> <span class="nav-text">无关性的基石</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Class类文件的结构"><span class="nav-number">1.1.2.</span> <span class="nav-text">Class类文件的结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字节码指令简介"><span class="nav-number">1.1.3.</span> <span class="nav-text">字节码指令简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#公有设计和私有实现"><span class="nav-number">1.1.4.</span> <span class="nav-text">公有设计和私有实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Class文件结构的发展"><span class="nav-number">1.1.5.</span> <span class="nav-text">Class文件结构的发展</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">znewcradle</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

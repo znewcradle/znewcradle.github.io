@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,multi-threads," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="进程与线程 进程是程序的运行实例，是资源分配的最小单位；线程是进程中可以独立执行的最小单位；一个进程可以包含多个线程；同一个进程中的所有线程共享该进程的所有资源。特定的线程执行特定的任务，任务代表线程要完成的工作 多线程编程是以线程为基本抽象单位的一种编程范式  Java线程API java.lang.Thread是Java对线程的实现，Thread类及其子类的一个实例就是一个线程；创建一个线程就">
+<meta name="keywords" content="java,multi-threads">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程基础">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/java/multi-threads/Java多线程基础/index.html">
+<meta property="og:site_name" content="Znewradle&#39;s blog">
+<meta property="og:description" content="进程与线程 进程是程序的运行实例，是资源分配的最小单位；线程是进程中可以独立执行的最小单位；一个进程可以包含多个线程；同一个进程中的所有线程共享该进程的所有资源。特定的线程执行特定的任务，任务代表线程要完成的工作 多线程编程是以线程为基本抽象单位的一种编程范式  Java线程API java.lang.Thread是Java对线程的实现，Thread类及其子类的一个实例就是一个线程；创建一个线程就">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T07:22:23.977Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java多线程基础">
+<meta name="twitter:description" content="进程与线程 进程是程序的运行实例，是资源分配的最小单位；线程是进程中可以独立执行的最小单位；一个进程可以包含多个线程；同一个进程中的所有线程共享该进程的所有资源。特定的线程执行特定的任务，任务代表线程要完成的工作 多线程编程是以线程为基本抽象单位的一种编程范式  Java线程API java.lang.Thread是Java对线程的实现，Thread类及其子类的一个实例就是一个线程；创建一个线程就">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/java/multi-threads/Java多线程基础/"/>
+
+
+
+
+
+  <title>Java多线程基础 | Znewradle's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Znewradle's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/java/multi-threads/Java多线程基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="znewcradle">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Znewradle's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java多线程基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T15:20:29+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/21/java/multi-threads/Java多线程基础/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/21/java/multi-threads/Java多线程基础/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h3><ol>
+<li>进程是程序的运行实例，是资源分配的最小单位；线程是进程中可以独立执行的最小单位；一个进程可以包含多个线程；同一个进程中的所有线程共享该进程的所有资源。<strong>特定的线程执行特定的任务，任务代表线程要完成的工作</strong></li>
+<li>多线程编程是以线程为基本抽象单位的一种编程范式</li>
+</ol>
+<h3 id="Java线程API"><a href="#Java线程API" class="headerlink" title="Java线程API"></a>Java线程API</h3><ol>
+<li><p><code>java.lang.Thread</code>是Java对线程的实现，Thread类及其子类的一个实例就是一个线程；创建一个线程就是创建一个Thread类（及其子类）的实例，即：线程 = Thread实例，在Java中。</p>
+<ul>
+<li>run方法是线程任务处理逻辑的入口方法（Java虚拟机在运行时直接调用，不由应用代码调用），即：运行线程 = JVM执行该线程的run方法；<strong>run方法执行结束，相应的线程运行也就结束</strong></li>
+<li>启动线程，实质是请求JVM运行相应的线程，线程何时运行由线程调度器(Scheduler)决定</li>
+<li>创建线程<ul>
+<li>利用<code>Thread()</code>，需覆盖run()方法实现任务处理逻辑；</li>
+<li>利用<code>Thread(Runnable)</code>，传入实现Runnable接口的实例</li>
+<li>两种创建方式的不同实际上就是：继承和组合技术的不同，组合方式更加灵活；Runnable是普通对象，能只用Runnable就可，则不要创建线程实例</li>
+<li>Thread实际上实现了Runnable接口，从其实现源码可理解以上两种创建方式：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//From Thread </span></div><div class="line"><span class="comment">// target - Runnable</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (target != <span class="keyword">null</span>) &#123;</div><div class="line">        target.run();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>线程是“一次性用品”，不能重新调用已经运行结束的start方法，否则会抛出异常<code>IllegalThreadStateException</code></p>
+</li>
+<li><p>Java中线程的创建比对象创建代价更高，需要分配调用栈内存（跟踪调用关系和本地代码），且每个线程可能有一个内核线程对应；</p>
+</li>
+<li><p>Java中的任意一段代码都会由确定的线程负责执行；该线程也就是这段代码的执行线程。同一段代码可以被多个线程执行，通过<code>Thread.currentThread()</code>可以得到当前的执行线程，<strong>随着执行线程的不同返回的线程对象也不同</strong>。</p>
+<ul>
+<li>run方法也可以直接调用，但是此时的执行线程是调用者线程而不是新线程</li>
+</ul>
+</li>
+<li><p>线程的属性：</p>
+<ul>
+<li>ID：long，只读，标识不同线程；唯一性只是一次运行有效</li>
+<li>名称Name：String，可读性名称，为调试，建议设置有意义名称</li>
+<li>线程类别Daemon：<code>boolean</code>类型，可以设置为true则变成守护线程；<code>setDaemon</code>方法必须在对start方法调用之前，否则抛出<code>IllegalThreadStateException</code></li>
+<li>优先级Priority：<code>int</code>，线程调度器的提示，一般使用默认优先级</li>
+</ul>
+<blockquote>
+<p>用户线程会阻止JVM正常停止，即JVM只有在所有用户线程运行结束后才会正常停止；而守护线程并不影响JVM的正常停止。因此，守护线程通常用于执行一些重要性不高的任务</p>
+</blockquote>
+</li>
+<li><p>Thread类常用的方法：</p>
+<ul>
+<li><p><code>static Thread currentThread(), void static yield(),</code></p>
+<p><code>void  static sleep(long mills)</code></p>
+</li>
+<li><p><code>run(), start()</code></p>
+</li>
+<li><p><code>join()</code>，A调用B的join，则A被挂起直到B运行结束；也就是调用join()方法的线程会继续运行，但是哪个线程中出现B.join()则该线程被</p>
+</li>
+</ul>
+</li>
+<li><p>Thread类的废弃方法：<code>stop, suspend, resume</code></p>
+</li>
+<li><p>线程的层次关系：</p>
+<ul>
+<li>Thread A创建了Thread B，则Thread A和Thread B构成父子线程关系</li>
+<li>默认的，父线程和子线程在守护线程和用户线程上保持一致性；可以通过<code>setDaemon</code>来改变</li>
+<li>子线程继承父线程的优先级</li>
+<li>父子线程生命周期没有必然联系</li>
+</ul>
+</li>
+<li><p>线程的生命周期：Thread.getState()返回Thread.State的枚举类型，可能的线程状态如下：</p>
+<ul>
+<li>NEW：创建而未启动；</li>
+<li>RUNNABLE：拥有子状态READY和RUNNING<ul>
+<li>READY：可以被Scheduler进行调度使之RUNNING</li>
+<li>RUNNING：线程正在运行，线程可以之后转为READY(比如，调用Thread.yield)</li>
+</ul>
+</li>
+<li>BLOCKED：线程发起阻塞I/O或申请由其他资源独占资源（锁），进行阻塞</li>
+<li>WAITING：等待其他线程执行特定操作，更改为waiting状态的方法：wait, join, park；从WAITING到RUNNABLE可以调用对应的notify，notifyAll和unpark</li>
+<li>TIMED_WAITING：与WAITING类似，是带有时间限制的等待状态，到期会自动转为RUNNABLE</li>
+<li>TERMINATED：结束状态，只可能有一次处于该状态</li>
+</ul>
+<blockquote>
+<p>一个线程整个lifetime，只可能处于NEW和TERMINATE状态一次</p>
+</blockquote>
+</li>
+<li><p>线程的监视：</p>
+<ul>
+<li>主要是：获取并查看程序的线程转储，其中包含线程转储那一刻的线程信息（属性，生命周期状态，调用栈和锁等）</li>
+</ul>
+</li>
+</ol>
+<h2 id="多线程编程的目标与挑战"><a href="#多线程编程的目标与挑战" class="headerlink" title="多线程编程的目标与挑战"></a>多线程编程的目标与挑战</h2><ol>
+<li>串行（单线串行）、并发（单线交替）与并行（多线同时）——多线程编程的实质是将任务处理的方式由串行改为并发，但是并非所有任务可并发化</li>
+</ol>
+<h3 id="竞态"><a href="#竞态" class="headerlink" title="竞态"></a>竞态</h3><ol>
+<li>定义：<strong>计算结果的正确性与时间有关的现象</strong></li>
+</ol>
+<h4 id="二维表分析法：解释竞态的结果"><a href="#二维表分析法：解释竞态的结果" class="headerlink" title="二维表分析法：解释竞态的结果"></a>二维表分析法：解释竞态的结果</h4><ol>
+<li>术语：<ul>
+<li>状态变量：类的实例变量、静态变量；</li>
+<li>共享变量：可以被多个线程共同访问的变量</li>
+</ul>
+</li>
+<li>导致竞态的常见原因是：多个线程在没有采取任何控制措施的情况下并发地更新、读取同一个共享变量。<ul>
+<li>竞态是指计算的正确性依赖于相对时间顺序或者线城的交错；竞态不一定导致计算结果的不正确，但是结果时而正确时而错误。</li>
+<li>竞态往往伴随着读取脏数据(Dirty Read)</li>
+</ul>
+</li>
+<li>竞态的模式与竞态产生的条件<ul>
+<li>竞态的两种模式：read-modify-write（读-改-写）和check-then-act（检测而后行）<ul>
+<li>read-modify-write：先读再修改后写回，这时可能存在脏读，读取了值后值被更新，写回的时候覆盖了上一次更新</li>
+<li>check-then-act：读取某个共享变量的值，根据该变量的值决定下一步的动作，因为在读取之后，还是有其他线程会更新该变量的值</li>
+<li>局部变量访问的是各自局部变量不会导致竞态</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="线程安全性"><a href="#线程安全性" class="headerlink" title="线程安全性"></a>线程安全性</h4><ol>
+<li><p>定义：如果一个类在单线程环境下能够运作正常，并且在多线程环境下，在其使用方不必为其做任何改变的情况下也能运作正常，则线程安全，该类也具有线程安全性。</p>
+</li>
+<li><p>线程安全问题表现在3个方面：原子性、可见性和有序性</p>
+</li>
+<li><p>原子性：</p>
+<ul>
+<li><p>对于涉及共享变量访问的操作，该操作<strong>从其执行线程以外的任意线程来看</strong>是不可分割，则该操作是原子操作</p>
+</li>
+<li><p>原子操作是针对访问共享变量的操作而言的；涉及局部变量访问的操作无所谓是否是原子；原子操作只有在多线程环境下有意义</p>
+</li>
+<li><p>Java实现原子性的两种方式：</p>
+<ul>
+<li>使用锁Lock，具有排他性，消除竞态——软件层面</li>
+<li>利用处理器提供的CAS（Compare-and-Swap）指令——硬件层面</li>
+<li>在Java中，除了long和double以外的基础类型和引用类型变量的写操作都是原子的；针对任何变量的读操作都是原子操作。但是用<strong>volatile</strong>关键字修饰的long/double型变量的写操作具有原子性</li>
+<li>volatile关键字仅能保障变量写操作的原子性，并不保障其他操作（read-modity-write操作和check-then-act）的原子性</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>可见性</p>
+<ul>
+<li><p>如果一个线程对某个共享变量进行更新之后，后续访问该变量的线程可以读取到该新的结果，则称<strong>该线程对该共享变量的更新对其他线程可见</strong>。</p>
+<p>即，一个线程对共享变量的更新的结果对于读取相应共享变量的线程而言是否可见</p>
+</li>
+<li><p>两个线程分别运行在不同的处理器上，而这两个线程所共享的变量却被分配到寄存器上进行存储，就会产生可见性问题（但是共享变量被分配到内存上也不能保证该变量可见性——由于高速缓存子系统的存在（高速缓存，写缓冲器，无效优化队列等），一个处理器的写缓冲器中的内容无法被另一个处理器读取，因此运行在另一个处理器上的线程无法看到）</p>
+</li>
+<li><p>为了保障可见性，必须使一个处理器对共享变量所做的更新最终被写入该处理器的高速缓存中或主内存中（而不是始终停留在其写缓冲器中），即：冲刷处理器缓存。<strong>volatile关键字，就是提示JIT编译器被修饰的变量可能被多个线程共享，阻止JIT编译器做出可能导致程序运行不正常的优化，使相应的处理器执行刷新处理器的缓存的动作，从而保障写可见性。</strong></p>
+</li>
+<li><p>可见性的保障，意味着一个线程能够读取到共享变量的相对新值（一个线程更新该变量的值之后，其他线程能够读取到这个更新之后的值，则为相对新值），而非最新值（读线程排斥其他写线程，所读取的值）</p>
+</li>
+<li><p>Java语言规范保证：父线程在启动子线程之前对共享变量的更新对于子线程来说是可见的，线程终止后该线程共享变量的更新对于调用该线程的join方法的线程而言是可见的（因为调用join方法的线程会先结束，所以调用该线程的join方法线程是可见的），但是<strong>父线程在子线程启动后，对共享变量的更新对子线程的可见性没有保证</strong></p>
+</li>
+</ul>
+</li>
+<li><p>*有序性</p>
+<ul>
+<li>重排序：一个处理器上执行的多个操作，从其他处理器的角度来看，其顺序可能与目标代码所指定的顺序不一致</li>
+<li>重排序是对内存访问（读写）所作的一种优化，在单线程下不影响程序正确性但是可能会对多线程程序的正确性产生影响，导致线程安全问题</li>
+<li>源码顺序、程序顺序、执行顺序、感知顺序</li>
+<li>指令重排序 —— 存储子系统重排序</li>
+</ul>
+</li>
+<li><p>上下文切换：多个线程共享同意给处理器的产物，时间片的存在导致线程调度，需要上下文切换——切出和切入</p>
+<ul>
+<li>生命周期：从RUNNABLE状态与非runnable状态（blocked，waiting和timed_waiting中任意一个子状态）之间的切换，就是一个上下文切换的过程</li>
+<li>线程暂停——由RUNABLE到非RUNNABLE；线程被唤醒——从非RUNNABLE到RUNNABLE状态</li>
+<li>自发性上下文切换——非自发性上下文切换；上下文切换的开销导致多线程不一定就比单线程编程的计算效率高</li>
+</ul>
+</li>
+<li><p>线程的活性故障：死锁、锁死、活锁、饥饿</p>
+</li>
+<li><p>资源争用与调度：</p>
+<ul>
+<li>排他性资源 &amp; 资源争用 （高争用 and 低争用 vs 高并发 and 低并发）</li>
+<li>公平调度（不会饥饿但是吞吐率较小） vs 非公平调度（首选，吞吐率大，缺点是可能导致饥饿现象）</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/multi-threads/" rel="tag"># multi-threads</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/java/jvm/虚拟机类加载机制/" rel="next" title="虚拟机类加载机制">
+                <i class="fa fa-chevron-left"></i> 虚拟机类加载机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/java/multi-threads/Java线程同步机制/" rel="prev" title="Java线程同步机制">
+                Java线程同步机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/04/21/java/multi-threads/Java多线程基础/"
+           data-title="Java多线程基础" data-url="http://yoursite.com/2019/04/21/java/multi-threads/Java多线程基础/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">znewcradle</p>
+              <p class="site-description motion-element" itemprop="description">This is a website to show my blogs</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/znewcradle" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#进程与线程"><span class="nav-number">1.</span> <span class="nav-text">进程与线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java线程API"><span class="nav-number">2.</span> <span class="nav-text">Java线程API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多线程编程的目标与挑战"><span class="nav-number"></span> <span class="nav-text">多线程编程的目标与挑战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#竞态"><span class="nav-number">1.</span> <span class="nav-text">竞态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#二维表分析法：解释竞态的结果"><span class="nav-number">1.1.</span> <span class="nav-text">二维表分析法：解释竞态的结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#线程安全性"><span class="nav-number">1.2.</span> <span class="nav-text">线程安全性</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">znewcradle</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

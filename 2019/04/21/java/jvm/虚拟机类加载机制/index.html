@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="jvm,java," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="虚拟机类加载机制概述JVM的类加载机制：把描述类的数据从Class文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可被虚拟机直接使用的Java类型 类加载、连接和初始化过程都是在程序运行期间完成的；虽有性能开销，但是由于运行期加载和动态连接使得可以动态扩展语言 类加载的时机  从加载到内存到卸载出内存，整个生命周期包括7个阶段：加载、验证、准备、解析、初始化、使用和卸载。其中，验证、准">
+<meta name="keywords" content="jvm,java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="虚拟机类加载机制">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/java/jvm/虚拟机类加载机制/index.html">
+<meta property="og:site_name" content="Znewradle&#39;s blog">
+<meta property="og:description" content="虚拟机类加载机制概述JVM的类加载机制：把描述类的数据从Class文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可被虚拟机直接使用的Java类型 类加载、连接和初始化过程都是在程序运行期间完成的；虽有性能开销，但是由于运行期加载和动态连接使得可以动态扩展语言 类加载的时机  从加载到内存到卸载出内存，整个生命周期包括7个阶段：加载、验证、准备、解析、初始化、使用和卸载。其中，验证、准">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://uocd4w.ch.files.1drv.com/y4mcda8QG4fMGv0CEsY0C_dov5SztHIQmLC9QwKIlkzv5pfshCA8uot-XuDftPqQBxr0HDDx1B--vhysuIIDyVmTwTh8zrLV0zYa1s_Sb1EcYBb5terEmVGtPiV5hbcTu1A03QrNQmaL1UsfP7wjPz_vGnb90vHz_XnIm1Cia0lm0GIoGmxkgIH0acsJvkpWAZuXB0ut-dBZDbIiB8lLm60IA?width=544&height=482&cropmode=none">
+<meta property="og:updated_time" content="2019-04-21T02:52:59.897Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="虚拟机类加载机制">
+<meta name="twitter:description" content="虚拟机类加载机制概述JVM的类加载机制：把描述类的数据从Class文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可被虚拟机直接使用的Java类型 类加载、连接和初始化过程都是在程序运行期间完成的；虽有性能开销，但是由于运行期加载和动态连接使得可以动态扩展语言 类加载的时机  从加载到内存到卸载出内存，整个生命周期包括7个阶段：加载、验证、准备、解析、初始化、使用和卸载。其中，验证、准">
+<meta name="twitter:image" content="https://uocd4w.ch.files.1drv.com/y4mcda8QG4fMGv0CEsY0C_dov5SztHIQmLC9QwKIlkzv5pfshCA8uot-XuDftPqQBxr0HDDx1B--vhysuIIDyVmTwTh8zrLV0zYa1s_Sb1EcYBb5terEmVGtPiV5hbcTu1A03QrNQmaL1UsfP7wjPz_vGnb90vHz_XnIm1Cia0lm0GIoGmxkgIH0acsJvkpWAZuXB0ut-dBZDbIiB8lLm60IA?width=544&height=482&cropmode=none">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/java/jvm/虚拟机类加载机制/"/>
+
+
+
+
+
+  <title>虚拟机类加载机制 | Znewradle's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Znewradle's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/java/jvm/虚拟机类加载机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="znewcradle">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Znewradle's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">虚拟机类加载机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T10:51:11+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/21/java/jvm/虚拟机类加载机制/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/21/java/jvm/虚拟机类加载机制/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="虚拟机类加载机制"><a href="#虚拟机类加载机制" class="headerlink" title="虚拟机类加载机制"></a>虚拟机类加载机制</h2><h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>JVM的类加载机制：把描述类的数据从Class文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可被虚拟机直接使用的Java类型</p>
+<p>类加载、连接和初始化过程都是在程序运行期间完成的；虽有性能开销，但是由于运行期加载和动态连接使得可以动态扩展语言</p>
+<h4 id="类加载的时机"><a href="#类加载的时机" class="headerlink" title="类加载的时机"></a>类加载的时机</h4><blockquote>
+<p> 从加载到内存到卸载出内存，整个生命周期包括7个阶段：加载、验证、准备、解析、初始化、使用和卸载。其中，<strong>验证、准备和解析</strong>统称为连接。</p>
+<ol>
+<li>加载、验证、准备、初始化和卸载5个阶段顺序是确定的。解析阶段可以在初始化阶段之后再开始，支持动态绑定。</li>
+</ol>
+</blockquote>
+<ol>
+<li><p>VM规范规定了有且有5种情况必须立即对类进行初始化（则加载、验证、准备也需发生）</p>
+<ul>
+<li>遇到new\getstatic\putstatic\invokestatic这4条字节码指令，且类没有进行初始化（被final修饰的常态字段除外，因为已在编译器把结果放入常量池的静态字段外）</li>
+<li>使用<code>java.lang.reflect</code>包的方法对类进行反射调用，且类没有初始化</li>
+<li>初始化一个类时，其父类还没有初始化</li>
+<li>虚拟机启动时，需要指定一个要执行的主类（main()方法），需要初始化主类</li>
+<li>使用JDK1.7动态语言支持时，如果一个<code>java.lang.invoke.MethodHandle</code>实例最后的解析结果<code>REF_getStatic, REF_putStatic, REF_invokeStatic</code>的方法句柄，且方法句柄对应的类没有进行过初始化</li>
+<li>接口也有初始化过程，但是其初始化时，并不要求其父接口全部完成了初始化，只有真正用到父接口时才会初始化</li>
+</ul>
+</li>
+</ol>
+<h3 id="类加载的过程"><a href="#类加载的过程" class="headerlink" title="类加载的过程"></a>类加载的过程</h3><p>加载、验证、准备、解析和初始化</p>
+<ol>
+<li><p>加载</p>
+<ul>
+<li>通过一个类的全限定名来获取定义此类的二进制字节流(灵活性大，可以从zip，网络，运行时计算、其他文件生成、数据库中读取)</li>
+<li>将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构</li>
+<li>在内存中生成一个代表这个类的<code>java.lang.Class</code>对象，作为方法区这个类的各种数据<br>的访问入口</li>
+</ul>
+<p>(数组本身不通过类加载器创建，默认由JVM直接创建，但是数组类的元素类型最终需要类加载器创建；数组的组件是引用类型则需要递归加载组件，可见性与组件类型一致；如果基础类型则默认public，JVM会将数组标记为与引导类加载器关联)</p>
+</li>
+<li><p>验证</p>
+<ul>
+<li>确保Class文件的字节流中包含的信息符合当前虚拟机的要求，并且不会危害虚拟机自身的安全。如果验证到违反约束，则抛出<code>java.lang.VerifyError</code>异常或其子类异常</li>
+<li>文件格式验证：<strong>验证字节流是否符合Class文件格式的规范</strong>，并且可被当前版本的VM处理；通过验证后，字节流进入内存的方法区中存储，其他验证阶段基于方法区存储结构进行，不会在直接操作字节流；</li>
+<li>元数据验证：对字节码描述信息进行予以分析，确保其描述信息符合规范（类元信息）</li>
+<li>字节码验证：通过数据流和控制流分析确定程序语义是合法、符合逻辑的；对类的方法体进行校验分析，确保被校验类的方法在运行时不会做出危害虚拟机安全的事件。</li>
+<li>符号引用验证：将符号引用转化为直接引用，对类自身以外的信息进行匹配性校验；确保解析动作能正常执行，否则抛出<code>java.lang.IncompatibleClassChangeError</code>异常的子类</li>
+</ul>
+</li>
+<li><p>准备</p>
+<ul>
+<li>为类变量分配内存并设置类变量初始值阶段（仅为static类变量），所用内存在方法区中进行分配，通常初始为零值。</li>
+<li>如果类字段属性表中存在ConstantValue，则准备阶段value会被初始化为ConstantValue属性所指定的值。</li>
+</ul>
+</li>
+<li><p>解析</p>
+<ul>
+<li>虚拟机将常量池内的符号引用替换为直接引用的过程<ul>
+<li>符号引用：以一组符号来描述所用的目标，只要无歧义定位到目标即可；符号引用与虚拟机实现的内存布局无关，引用目标不一定已经加载到内存中</li>
+<li>直接引用：可以直接指向目标的指针、相对偏移量或是一个能间接定位到目标的句柄，和内存布局相关。（同一个符号引用在不同VM上翻译出来的直接引用一般不同）</li>
+</ul>
+</li>
+<li>虚拟机可以对第一次解析结果进行缓存，静态解析第一次解析成败决定之后是否抛出异常</li>
+<li><code>invokedynamic</code>指令，用于支持动态语言，在运行时进行解析动作；其余为静态指令（可以在刚加载完成还没开始执行代码时就进行解析）</li>
+<li>主要针对：接口、字段、类方法、接口方法、方法类型、方法句柄和调用限定符7类符号引用<ul>
+<li>类或接口解析：假设当前代码所处的类为D，把一个从未解析过的符号引用N解析为一个类或接口C的直接引用，则：<ul>
+<li>C不是数组，VM将N的全限定名传递给D的类加载器去加载C</li>
+<li>C是数组且数组类型为对象，则按照👆加载数组元素类型，解这VM生成代表此数组维度和元素的数组对象</li>
+<li>👆完成后，C有效，还要进行符号引用验证，确认D对C的访问权限</li>
+</ul>
+</li>
+<li>字段解析：字段所属的类或接口用C表示，如果C本身包含简单名称和字段描述符斗鱼目标相匹配的字段，则返回字段的直接引用；否则如果实现接口则按继承关系从下往上递归搜索各个接口和父接口；如果C不是Object则会按继承关系从下往上递归搜索父类；否则查找失败，抛出异常</li>
+<li>类方法解析：先解析出类方法表的class_index项中索引的方法所属的的类或接口的符号引用<ul>
+<li>类方法和接口方法符号引用的常量类型定义是分开的，在类方法表中发现class_index中索引是个接口，抛出<code>java.lang.IncompatibleClassChangeError</code></li>
+<li>查找是否有简单名称和描述符都与目标相匹配的方法，如果有则返回该方法引用</li>
+<li>否则，在父类中递归查找是否有匹配的方法；</li>
+<li>否则，在类C实现的接口列表及它们的父接口之中递归查找</li>
+<li>否则，查找失败，抛出<code>java.lang.NoSuchMethodError</code></li>
+</ul>
+</li>
+<li>接口方法解析：先解析接口方法表的<code>class_index</code>项中索引的方法所属的类或接口的符号引用<ul>
+<li>在接口方法表中发现类索引C是类，则抛出<code>IncompatibleClassChangeError</code></li>
+<li>否则，在接口中查找是否有简单名称和描述符都与目标匹配的方法，如果有则返回该方法的直接引用；</li>
+<li>否则，在接口C的父接口中递归查找，直到Object；</li>
+<li>否则，查找失败，抛出<code>java.lang.NoSuchMethodError</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>初始化</p>
+<ul>
+<li><p>准备阶段，变量已按系统要求赋过初始值；初始化阶段，则根据程序员的代码去初始化类变量和其他资源，即执行类构造器<code>&lt;clinit&gt;()</code>方法</p>
+</li>
+<li><p><code>&lt;clinit&gt;()</code>方法由编译器自动收集类中的所有类变量的赋值动作和静态语句块（static{}）中的语句合并产生</p>
+<ul>
+<li>收集顺序由语句在源文件中出现的顺序所决定</li>
+<li>static语句块中只能访问到定义在static语句块之前的变量；定义在之后的变量可以赋值但不能访问</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">    <span class="keyword">static</span> &#123;</div><div class="line">        i = <span class="number">0</span>;     <span class="comment">// 可以赋值</span></div><div class="line">        System.out.println(i);  <span class="comment">// "非法向前引用"，即不能访问</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">static</span> <span class="keyword">int</span> i = <span class="number">1</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><code>&lt;clinit&gt;()</code>方法与类的构造函数<code>&lt;init&gt;()</code>方法不同，不用显式调用父类构造器，VM保证在子类的<code>&lt;clinit&gt;()</code>方法执行之前，父类的<code>&lt;clinit&gt;()</code>方法已经执行完毕- -<ul>
+<li>Object类的<code>&lt;clinit&gt;()</code>方法第一个被执行</li>
+<li>父类中定义的静态语句块要优先于子类的变量赋值操作</li>
+</ul>
+</li>
+<li><code>&lt;clinit&gt;()</code>方法并非必需，即类中没有静态语句块 +  对变量的赋值操作；则编译器不为此类生成该方法</li>
+<li>接口有赋值操作仍有<code>&lt;clinit&gt;()</code>方法，但是不需先执行父接口的<code>&lt;clinit&gt;()</code>方法，只有当父接口中定义的变量使用时，其才会被初始化。<strong>接口的实现类，同</strong></li>
+<li>VM会保证一个类的<code>&lt;clinit&gt;()</code>方法在多线程环境中被正确加锁、同步，保证只有一个线程执行类的<code>&lt;clinit&gt;()</code>方法，其他阻塞</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h4><ol>
+<li><p>类加载器：通过一个类的全限定名来获取此类的二进制字节流的代码模块</p>
+<ul>
+<li>任意一个类，都需要加载它的类加载器和这个类本身以统确立其在JVM中的唯一性</li>
+<li>只有两个类由同一个类加载器加载才能比较是否相等<code>equals()/ isAssignableFrom()/ isInstance()</code>的返回结果</li>
+</ul>
+</li>
+<li><p>双亲委派模型（JVM角度，只有两种不同的类加载器）</p>
+<ul>
+<li>启动类加载器(Bootstrap ClassLoader)用C++实现，是虚拟机自身的一部分<ul>
+<li>负责将存放在<code>&lt;JAVA_HOME&gt;\bin</code>目录中，或者被<code>-Xbootclasspath</code>参数指定的路径，并且是虚拟机识别的类库加载到虚拟机内存中（启动类加载器无法被Java程序直接引用，用户在编写自定义类加载器时，如果需要把加载请求委派给引导类加载器，那直接使用null代替即可）</li>
+</ul>
+</li>
+<li>其他类加载器由Java实现，独立于虚拟机外部，并且全部继承自抽象类<code>java.lang.ClassLoader</code><ul>
+<li>扩展类加载器：由<code>sun.misc.Launcher$ExtClassLoader</code>实现，负责加载<code>&lt;JAVA_HOME&gt;\lib\ext</code>目录中或者被<code>java.ext.dirs</code>系统变量所指定的路径中的所有类库（开发者可以直接使用）</li>
+<li>应用程序类加载器：系统类加载器，负责加载用户类路径上所指定的类库，开发者可以直接使用（如果没有自定义类加载器，则为默认的类加载器）</li>
+</ul>
+</li>
+<li>类加载器之间的层次关系，为类加载器的双亲委派模型：除了启动类加载器外，其余类都应当有自己的父类加载器（一般使用组合关系复用父加载器的代码）</li>
+</ul>
+<p><img src="https://uocd4w.ch.files.1drv.com/y4mcda8QG4fMGv0CEsY0C_dov5SztHIQmLC9QwKIlkzv5pfshCA8uot-XuDftPqQBxr0HDDx1B--vhysuIIDyVmTwTh8zrLV0zYa1s_Sb1EcYBb5terEmVGtPiV5hbcTu1A03QrNQmaL1UsfP7wjPz_vGnb90vHz_XnIm1Cia0lm0GIoGmxkgIH0acsJvkpWAZuXB0ut-dBZDbIiB8lLm60IA?width=544&amp;height=482&amp;cropmode=none" alt="class loader"></p>
+<ul>
+<li>双亲委派模型的工作过程：类加载器收到了类加载请求后，首先该请求委派给父类加载器 -&gt; 所有的加载请求最终都会传送到顶层的启动类加载器 -&gt; 只有父类无法完成时，子加载器才会尝试自己加载<ul>
+<li>好处：Java类随着类加载器一起具备带有优先级的层次关系（比如，Object类在程序的各种类加载器环境中都是同一个类）</li>
+<li>实现：集中在<code>java.lang.ClassLoader#loadClass()</code>方法中，如下：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="keyword">boolean</span> resolve)</div><div class="line">    <span class="keyword">throws</span> ClassNotFoundException &#123;</div><div class="line">    <span class="keyword">synchronized</span> (getClassLoadingLock(name)) &#123;</div><div class="line">        <span class="comment">// 首先，检查请求的类是否已经被加载过</span></div><div class="line">        Class&lt;?&gt; c = findLoadedClass(name);</div><div class="line">        <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">long</span> t0 = System.nanoTime();</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                <span class="keyword">if</span> (parent != <span class="keyword">null</span>) &#123;</div><div class="line">                    c = parent.loadClass(name, <span class="keyword">false</span>);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    c = findBootstrapClassOrNull(name);</div><div class="line">                &#125;</div><div class="line">            &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</div><div class="line">                <span class="comment">// ClassNotFoundException thrown 如果父类加载器抛出</span></div><div class="line">                <span class="comment">// 说明服父类加载器无法完成加载请求</span></div><div class="line">            &#125;</div><div class="line">            </div><div class="line">            <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</div><div class="line">                <span class="comment">// 在父类加载器无法加载的时候，再调用本身的的findClass方法进行类加载</span></div><div class="line">                <span class="keyword">long</span> t1 = System.naoTime();</div><div class="line">                c = findClass(name);</div><div class="line">                </div><div class="line">                <span class="comment">// this is the defining class loader; record the stats</span></div><div class="line">          sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</div><div class="line">           sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</div><div class="line">                sun.misc.PerfCounter.getFindClasses().increment();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> c;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>破坏双亲委派模型</p>
+<ul>
+<li><p>双亲委派模型之前</p>
+<ul>
+<li><p>用户可以继承<code>ClassLoader</code>并重写protected的loadClass()方法</p>
+</li>
+<li><p>JDK1.2之后，不提倡覆盖loadClass()方法，应当把类加载逻辑写到<code>findClass()</code>方法中，在<code>loadClass()</code>方法的逻辑里如果父类加载失败，则会调用自己的findClass()方法</p>
+</li>
+</ul>
+</li>
+<li><p>自身缺陷</p>
+<ul>
+<li>为解决<strong>基础类调用回用户的代码</strong>，如<code>JNDI</code>；在线程上下类加载器可以通过<code>java.lang.Thread</code>类的<code>setContextClassLoader()</code>方法进行设置</li>
+</ul>
+</li>
+<li><p>用户对程序动态性的追求：OSGi，每个模块(Bundle)都有自己的类加载器并按照以下顺序进行类搜索：</p>
+<ul>
+<li>将以<code>java.*</code>开头的类委派给父类加载器加载；</li>
+<li>否则，将委派列表名单内的类委派给父类加载器加载；</li>
+<li>否则，将Import列表中的类委派给Export这个类的Bundle的类加载器加载</li>
+<li>否则，查找当前的Bundle的ClassPath，使用自己的类加载器加载</li>
+<li>否则，查找类是否在自己的Fragment Bundle中；如果在，则委派给Fragment Bundle的类加载器加载</li>
+<li>否则，查找Dynamic Import列表的Bundle，委派给对应的Bundle的类加载器加载</li>
+<li>否则，类查找失败</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="第八章-虚拟机字节码执行引擎"><a href="#第八章-虚拟机字节码执行引擎" class="headerlink" title="第八章 虚拟机字节码执行引擎"></a>第八章 虚拟机字节码执行引擎</h3><p>####　概述</p>
+<ol>
+<li>虚拟机的执行引擎由自己实现，可以自行制定指令集与执行引擎的结构体系，并且能够执行不被硬件直接支持的指令集格式</li>
+<li>JVM的执行引擎：输入字节码 -&gt;  处理执行 -&gt; 输出执行结果</li>
+</ol>
+<h4 id="运行时栈帧结构"><a href="#运行时栈帧结构" class="headerlink" title="运行时栈帧结构"></a>运行时栈帧结构</h4><blockquote>
+<p>栈帧信息：动态连接 + 方法返回地址 +其他附加信息（ＶＭ添加规范中没有的描述信息）</p>
+</blockquote>
+<ol>
+<li>栈帧：支持虚拟机进行方法调用和方法执行的数据结构，VM运行时数据区中的虚拟机栈的栈元素<ul>
+<li>存储方法的局部变量表、操作数栈、动态连接和方法返回地址</li>
+<li>每个方法的调用开始至执行完成 &lt;-&gt; 栈帧在VM栈中入栈到出栈</li>
+<li>只有位于栈顶的栈帧，即当前栈帧是有效的，与之关联的方法为当前方法（执行引擎运行的所有字节码指令都只对当前栈帧进行操作）</li>
+</ul>
+</li>
+<li>局部变量表<ul>
+<li>存放方法参数和方法内部定义的局部变量，以变量槽(Variable Slot)为最小单位（Slot的长度随着处理器、操作系统或虚拟机的不同而发生变化；一个Slot可以存放32位以内的数据类型：<code>boolean, byte, char,  short, int, float, reference和returnAddress</code>，其中，reference类型表示对对象实例的引用，可以直接或间接找到对象在堆中的数据存放的起始地址索引；查到对象所属数据类型在方法区中的存储的类型信息。returnAddress原用来处理异常，现在由异常表代替）</li>
+<li>对于64位数据(long, double)，VM会高位对齐，连续分配两个slot空间；局部变量表简历在线程堆栈上，是线程私有数据，不会引起数据安全问题。但是存放64位的两个slot，不允许单独访问其中一个，某则会在类加载的校验阶段抛出异常</li>
+<li>局部变量表中第0位索引的Slot默认用于传递方法所属对象实例的引用，即this引用；之后是传递给方法的参数；最后是方法体内按顺序定义的变量</li>
+<li>局部变量表中的slot可复用，如果某个变量超过其作用域，则可以交给其他变量使用 <ul>
+<li>变量超过其作用域后，占用的Slot不会立即被回收；只有当新的变量请求slot空间时，才会对其回收。所以，对于占用大量内存，实际上不会再使用的变量，手动将其设置为null值，<strong>但是最好是通过变量作用域控制变量回收时间</strong>（因为JIT编译器在优化过程可能会将赋null值的操作消除）</li>
+<li>局部变量如果没有赋初始值则不能使用，不是任何情况下变量都有默认赋值</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>操作数栈<ul>
+<li>操作数栈的最大深度也在编译的时候写入到Code属性的<code>max_locals</code>数据项中<ul>
+<li>方法刚执行，操作数栈为空，在方法执行过程中，字节码指令对其进行读取和写入（如：算术运算，调用方法传参）</li>
+<li>大多VM会令两个栈帧出现一部分重叠 ，方便共享数据，无需额外复制</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>动态连接<ul>
+<li>每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用，为支持方法调用过程中的动态连接。<ul>
+<li>静态解析：在类加载阶段或者第一次使用时将符号引用转化为直接引用</li>
+<li>动态连接：在运行期间将符号引用转化为直接引用</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>方法返回地址<ul>
+<li>正常完成出口：执行引擎遇到任意一个方法返回的字节码指令，可能会有返回值传递给上层的方法调用者</li>
+<li>异常完成出口：方法执行过程中有未得到处理的运行时异常，用throw抛出的异常且本方法的异常表中没有搜索到匹配的异常处理器</li>
+<li>方法退出后，都需要返回到方法被调用的位置，可能需要在栈帧中保存信息帮助恢复上层方法的执行状态（方法退出的过程实际上就等同当前栈帧出栈）</li>
+</ul>
+</li>
+</ol>
+<h4 id="方法调用"><a href="#方法调用" class="headerlink" title="方法调用"></a>方法调用</h4><blockquote>
+<p>方法调用唯一任务是<strong>确定被调用方法的版本</strong>，暂时不涉及方法内部的具体运行过程。方法调用在Class文件中存储的只是符号引用，而不是实际运行时内存布局中的入口地址（直接引用）—— 提供了动态扩展能力</p>
+</blockquote>
+<ol>
+<li><p>解析</p>
+<ul>
+<li>方法在程序真正运行之前就有确定的调用版本，并且方法的调用版本在运行期间不可变——在类加载阶段解析，主要包括<strong>静态方法和私有方法</strong>（都不能重写）<ul>
+<li>JVM提供5条方法调用指令：<code>invokestatic</code>，<code>invokespecial</code>(实例构造器<init>方法、私有方法、父类方法)，<code>invokevirtual</code>虚方法，<code>invokeinterface</code>接口方法，<code>invokedynamic</code>运行时动态解析出调用点限定符所引用的方法</init></li>
+<li>只有被<code>invokestatic</code>和<code>invokespecial</code>指令调用的方法在类加载阶段解析，符合条件的有<strong>静态方法、私有方法、实例构造器、父类方法</strong>——非虚方法；其余为虚方法（除去final方法，通过<code>invokevirtual</code>调用，但是非虚方法）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>分派</p>
+<ul>
+<li><p>静态分派：以来静态类型来定位方法执行版本的分派动作——方法重载</p>
+<ul>
+<li>静态类型（外观类型）：在使用时发生变化，静态类型不会被改变，在编译期可知</li>
+<li>实际类型：在运行期才确定<code>Human man = new Man();</code></li>
+<li>（编译器）重载是通过<strong>参数的静态类型</strong>而不是实际类型作为判定依据；确定更加合适的版本：<code>char -&gt; int -&gt;  long -&gt; float -&gt; double -&gt; 装箱类型 -&gt; Serializable</code></li>
+<li>静态方法也有重载版本，同样也是通过静态分派选择重载版本</li>
+</ul>
+</li>
+<li><p>动态分派：与多态性有关——重写</p>
+<ul>
+<li><p><code>invokevirtual</code>指令的动态查找</p>
+<ol>
+<li>找到操作数栈顶的第一个元素所指向的对象的实际类型，记作C</li>
+<li><p>如果在类型C中找到与常量中的描述父和简单名称都相符的方法，则进行访问权限校验，如果通过则返回这个方法的直接引用，查找过程结束；如果不通过，则返回<code>java.lang.IllegalAccessError</code>异常</p>
+</li>
+<li><p>否则，按照继承关系从下往上依次对C的各个父类进行第2步的搜索和验证过程</p>
+</li>
+<li>如果始终没有找到合适的方法，则抛出<code>java.lang.AbstractMethodError</code></li>
+</ol>
+</li>
+<li><p>从Step 1可以看出，在运行期确定接收者的实际类型，将常量池符号中的类方法符号引用解析到不同的直接引用上</p>
+</li>
+</ul>
+</li>
+<li><p>单分派与多分派</p>
+<ul>
+<li>宗量：方法的接收者与方法的参数统称</li>
+<li>单分派：根据一个宗量对目标方法进行选择；多分派：根据多于一个宗量对目标方法进行选择</li>
+<li>静态多分派、动态单分派</li>
+<li>虚拟机动态分派：为类在方法区中简历虚方法表，使用虚方法索引来代替元数据查找，存放各个方法的实际入口地址，如果方法在子类中没有被重写，那么子类的虚方法表中存放父类相同方法的地址入口</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>动态类型语言支持(invokedynamic)</p>
+<ul>
+<li>动态类型语言：类型检查的主体过程在运行期而不是编译期；静态类型语言：在编译期进行类型检查过程</li>
+<li><code>java.lang.invoke</code>提供动态确定目标方法的机制，即<code>MethodHandle</code><ul>
+<li>Reflection(反射)机制是在Java代码层次重量级模拟方法调用，包含各种运行期信息；</li>
+<li><code>MethodHandle</code>则是在字节码层面上轻量级模拟方法调用，仅包含执行盖方法相关的信息（可以服务于JVM之上的各种语言）</li>
+</ul>
+</li>
+<li><code>invokedynamic</code>指令，为解决原有<code>invoke*</code>在JVM中固化，为高层实现提供基础<ul>
+<li>抵押给参数<code>CONSTANT_InvokeDynamic_info</code>，可以得到引导方法(Bootstrap Method)，方法类型(MethodType)和名称；</li>
+<li>引导方法有固定参数，返回真正要执行的目标方法调用</li>
+</ul>
+</li>
+<li>掌控方法分派规则：</li>
+</ul>
+</li>
+</ol>
+<h3 id="基于栈的字节码解释执行引擎"><a href="#基于栈的字节码解释执行引擎" class="headerlink" title="基于栈的字节码解释执行引擎"></a>基于栈的字节码解释执行引擎</h3><h4 id="解释执行"><a href="#解释执行" class="headerlink" title="解释执行"></a>解释执行</h4><p>只有确定Java实现版本和执行引擎运行模式，才能确定Class文件中的代码是解释执行还是编译执行</p>
+<h4 id="基于栈的指令集与基于寄存器的指令集"><a href="#基于栈的指令集与基于寄存器的指令集" class="headerlink" title="基于栈的指令集与基于寄存器的指令集"></a>基于栈的指令集与基于寄存器的指令集</h4><ol>
+<li>基于栈的指令集主要的优点是可移植，寄存器由硬件直接提供；寄存器的指令集则受硬件的约束。但是执行速度相对稍慢。</li>
+<li>栈架构的指令集，则代码更加紧凑，编译器实现更加简单；因为出栈和入栈产生相当多的指令数，有更频繁的内存访问</li>
+</ol>
+<h4 id="基于栈的解释器执行过程"><a href="#基于栈的解释器执行过程" class="headerlink" title="基于栈的解释器执行过程"></a>基于栈的解释器执行过程</h4>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jvm/" rel="tag"># jvm</a>
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/java/jvm/虚拟机执行子系统/" rel="next" title="虚拟机执行子系统">
+                <i class="fa fa-chevron-left"></i> 虚拟机执行子系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/java/multi-threads/Java多线程基础/" rel="prev" title="Java多线程基础">
+                Java多线程基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/04/21/java/jvm/虚拟机类加载机制/"
+           data-title="虚拟机类加载机制" data-url="http://yoursite.com/2019/04/21/java/jvm/虚拟机类加载机制/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">znewcradle</p>
+              <p class="site-description motion-element" itemprop="description">This is a website to show my blogs</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/znewcradle" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟机类加载机制"><span class="nav-number">1.</span> <span class="nav-text">虚拟机类加载机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#概述"><span class="nav-number">1.0.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类加载的时机"><span class="nav-number">1.0.2.</span> <span class="nav-text">类加载的时机</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类加载的过程"><span class="nav-number">1.1.</span> <span class="nav-text">类加载的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类加载器"><span class="nav-number">1.1.1.</span> <span class="nav-text">类加载器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第八章-虚拟机字节码执行引擎"><span class="nav-number">1.2.</span> <span class="nav-text">第八章 虚拟机字节码执行引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#运行时栈帧结构"><span class="nav-number">1.2.1.</span> <span class="nav-text">运行时栈帧结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法调用"><span class="nav-number">1.2.2.</span> <span class="nav-text">方法调用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于栈的字节码解释执行引擎"><span class="nav-number">1.3.</span> <span class="nav-text">基于栈的字节码解释执行引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解释执行"><span class="nav-number">1.3.1.</span> <span class="nav-text">解释执行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于栈的指令集与基于寄存器的指令集"><span class="nav-number">1.3.2.</span> <span class="nav-text">基于栈的指令集与基于寄存器的指令集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于栈的解释器执行过程"><span class="nav-number">1.3.3.</span> <span class="nav-text">基于栈的解释器执行过程</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">znewcradle</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

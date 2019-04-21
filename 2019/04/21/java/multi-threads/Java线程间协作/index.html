@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,multi-threads," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="线程间协作等待与通知： wait/notify 概念：  等待：线程因其执行目标动作所需的保护条件为满足而被暂停的过程 通知：线程更新系统状态，使得其他线程所需的保护条件得以满足的时候唤醒被暂停的线程  Java对等待和通知的实现：Object.wait()/Obejct.wait(long)等待方法——对应等待线程; Object.notify()/Object.notifyAll()通知方法—">
+<meta name="keywords" content="java,multi-threads">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java线程间协作">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/java/multi-threads/Java线程间协作/index.html">
+<meta property="og:site_name" content="Znewradle&#39;s blog">
+<meta property="og:description" content="线程间协作等待与通知： wait/notify 概念：  等待：线程因其执行目标动作所需的保护条件为满足而被暂停的过程 通知：线程更新系统状态，使得其他线程所需的保护条件得以满足的时候唤醒被暂停的线程  Java对等待和通知的实现：Object.wait()/Obejct.wait(long)等待方法——对应等待线程; Object.notify()/Object.notifyAll()通知方法—">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T07:34:03.952Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java线程间协作">
+<meta name="twitter:description" content="线程间协作等待与通知： wait/notify 概念：  等待：线程因其执行目标动作所需的保护条件为满足而被暂停的过程 通知：线程更新系统状态，使得其他线程所需的保护条件得以满足的时候唤醒被暂停的线程  Java对等待和通知的实现：Object.wait()/Obejct.wait(long)等待方法——对应等待线程; Object.notify()/Object.notifyAll()通知方法—">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/java/multi-threads/Java线程间协作/"/>
+
+
+
+
+
+  <title>Java线程间协作 | Znewradle's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Znewradle's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/java/multi-threads/Java线程间协作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="znewcradle">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Znewradle's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java线程间协作</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T15:32:47+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/21/java/multi-threads/Java线程间协作/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/21/java/multi-threads/Java线程间协作/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="线程间协作"><a href="#线程间协作" class="headerlink" title="线程间协作"></a>线程间协作</h2><h3 id="等待与通知：-wait-notify"><a href="#等待与通知：-wait-notify" class="headerlink" title="等待与通知： wait/notify"></a>等待与通知： wait/notify</h3><ol>
+<li><p>概念：</p>
+<ul>
+<li>等待：线程因其执行目标动作所需的保护条件为满足而被暂停的过程</li>
+<li><p>通知：线程更新系统状态，使得其他线程所需的保护条件得以满足的时候唤醒被暂停的线程</p>
+</li>
+<li><p>Java对等待和通知的实现：<code>Object.wait()/Obejct.wait(long)等待方法——对应等待线程; Object.notify()/Object.notifyAll()通知方法——对应通知线程</code>，代码模板如下：</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 受保护方法三要素：保护条件、暂停当前线程和目标动作</span></div><div class="line"><span class="keyword">synchronized</span>(someObject) &#123;</div><div class="line">    <span class="comment">// 只有持有一个对象的内部锁时，才能调用该对象的wait方法；故必须放在引导区</span></div><div class="line">    <span class="keyword">while</span> (保护条件不成立) &#123;</div><div class="line">        someObject.wait();</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 保护条件已经满足</span></div><div class="line">    doAction();    <span class="comment">// 执行目标动作</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>一个对象可能存在多个等待线程，可以通过其他线程执行<code>someObject.notify()</code>来唤醒，<code>someObject.wait()</code>会以原子操作的方式使其当前线程暂停并使该线程释放其持有的someObject对应的内部锁。</p>
+<p>被唤醒的线程在其再次持有someObject对应的内部锁的情况继续执行someObject.wait()中剩余的指令，直到wait方法返回。<strong>等待线程只在保护条件不成立的情况下才执行Object.wait()进行等待，在执行Object.wait()前需要判断条件是否成立。</strong></p>
+<p><strong>等待线程在其被唤醒、继续运行到其再次持有相应对象的内部锁的这段时间内，由于其他线程可能抢先获得相应的内部锁并更新了相关共享变量而导致该线程所需的保护条件又再次不成立</strong>，所以<strong>Object.wait()调用返回之后需要再次判断此时保护条件是否成立——放到循环语句中</strong>，保证目标动作只在保护条件成立的情况下才能执行！</p>
+</li>
+<li><p>等待线程对保护条件的判断以及目标动作的执行必须是原子操作，否则可能产生竞态；所以目标动作的执行必须和保护条件的判断以及Object.wait()的调用放在同一个对象所引导的临界区中</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 更新共享变量、唤醒其他线程</span></div><div class="line"><span class="comment">// 只有持有对象的内部锁时才能执行该对象的notify方法，因而也需放到临界区中</span></div><div class="line"><span class="comment">// Object.notify()的执行线程持有的相应对象的内部锁只有在Object.notify()调用</span></div><div class="line"><span class="comment">// 所在的临界区代码执行结束后才会被释放，方法本身并不会释放内部锁</span></div><div class="line"><span class="comment">// 所以尽可能将Object.notify放在靠近临界区结束的位置</span></div><div class="line"><span class="keyword">synchronized</span>(someObject) &#123;</div><div class="line">    <span class="comment">// 更新等待线程的保护条件涉及的共享变量</span></div><div class="line">    updateSharedState();</div><div class="line">    someObject.notify(); <span class="comment">// 唤醒其他线程</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>调用<code>Object.notify()</code>所唤醒的线程仅是相应对象上的任意等待线程；借助<code>Object.notifyAll()</code>可以唤醒所有等待线程</li>
+</ul>
+</li>
+<li><p>wait/notify的开销及问题</p>
+<ul>
+<li>过早唤醒：被唤醒但是保护条件没有成立，仍需继续等待</li>
+<li>信号丢失：Object.notify可能导致信号丢失</li>
+<li>欺骗性唤醒：等待线程在没有任何其他线程执行Object.notify(All)的情况下被唤醒</li>
+<li>上下文切换：锁的申请和释放可能会导致上下文切换</li>
+<li>建议：在保证程序正确性的前提下，使用Object.notify代替Object.notifyAll，避免过早唤醒；通知线程在执行完Object.notify/Object.notifyAll之后尽快释放相应的内部锁</li>
+<li>保守的做法用Object.notifyAll以保障正确性</li>
+<li>join方法是同步方法，在目标线程未结束时会调用wait方法来暂停目前线程，直到目标线程终止</li>
+</ul>
+</li>
+<li><p>Java条件变量</p>
+<ul>
+<li>JDK1.5引入的新标准类库<code>java.util.concurrent.locks.Condition</code>接口</li>
+<li>Condition接口提供await\signal\signalAll分别相当于方法Object.wait\Object.notify\Object.notifyAll；它们同样要求执行线程持有创建该Condition实例的显式锁</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConditionUsage</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Lock lock = <span class="keyword">new</span> ReentrantLock();</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Condition condition = lock.newCondition();</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aGuaredMethod</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        lock.lock();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">while</span> (保护条件不成立) &#123;</div><div class="line">                condition.await();</div><div class="line">            &#125;</div><div class="line">            <span class="comment">// 执行目标动作</span></div><div class="line">            doAction();</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doAction</span><span class="params">()</span> </span>&#123; <span class="comment">//... &#125;</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">anNotificationMethod</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">    	lock.lock();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">// 更新共享变量</span></div><div class="line">            changeState();</div><div class="line">            condition.signal();</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            lock.unlock();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">changeState</span><span class="params">()</span> </span>&#123; <span class="comment">//... &#125;</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>Condition接口对解决过早唤醒提供了支持，但是需要通过应用代码来维护保护条件与条件变量之间的对应关系——用不同的保护条件的等待线程需要调用不同的条件变量的await方法来实现其等待并使通知线程在更新了相关共享变量之后，仅调用与这些共享变量有关的保护条件所对应的条件比那辆的signal/signalAll方法来实现通知</li>
+<li><code>Condition.awaitUntil(Date deadline)</code>可以用实现带超时时间限制的等待，返回值可区分是由于等待超时返回还是由于其他线程执行了相应条件变量的signal/signalAll方法而返回。如果等待未超时，返回true可以选择继续等待：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">lock.lock();</div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">    <span class="keyword">while</span> (! ready) &#123;</div><div class="line">        Debug.error(<span class="string">""</span>);</div><div class="line">        <span class="keyword">if</span> (! continueToWait) &#123;</div><div class="line">           Debug.error(<span class="string">"Wait timed out, unable to execution target"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        continueToWait = condition.awaitUntil(deadline);</div><div class="line">    &#125;</div><div class="line">    doAction();</div><div class="line">&#125; <span class="keyword">finally</span> &#123;</div><div class="line">    lock.unlock();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>倒计时协调器：CountDownLatch</p>
+</li>
+<li><p>栅栏（CyclicBarrier）</p>
+<ul>
+<li><code>java.util.concurrent.CyclicBarrier</code>：线程都到达代码中某个点时，线程才能继续执行</li>
+<li>使用CyclicBarrier实现等待的线程被称为参与方，除最后一个线程外的恩赫参与方执行CyclicBarrier.await()都会导致该线程被暂停，但是最后一个线程执行CyclicBarrier.await()会使得所有参与方被唤醒，且自身不会被暂停</li>
+<li>CyclicBarrier可以重复使用</li>
+<li>典型的应用场景<ul>
+<li>迭代算法并发化</li>
+<li>在测试代码中模拟高并发</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>生产者——消费者模式</p>
+<ul>
+<li>生产者、消费者之间可以通过线程安全的队列<code>BlockingQueue</code>接口的实现类<code>ArrayBlockingQueue</code>来传递数据。它们是线程安全的队列——阻塞队列，分为有界队列和无界队列<ul>
+<li>ArrayBlockingQueue使用同一个显式锁，从而可能导致锁的高争用，进而导致较多的上下文切换</li>
+<li>LInkedBlockingQueue有两个显式锁，降低了锁争用；但是基于链表的缺点是可能增加垃圾回收的负担</li>
+<li>SynchronousQueue可被看作特殊有界队列，适合于消费者处理能力与生产者能力相差不大时使用</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>流量控制与信号量</p>
+<ul>
+<li><code>java.util.concurrent.Semaphore</code>用来实现流量控制，信号量Semaphore相当于虚拟资源配额管理器，<code>Semaphore.acquire()/release()</code>用于申请配额和返回配额；<code>Semaphore.acquire</code>如果因配额不足会暂停执行线程；<code>Semaphore.release</code>会使当前可用配额增加1，并唤醒相应的Semaphore实例的等待队列中任意一个等待线程</li>
+<li><code>Semaphore.acquire()/release()</code>的配对是需要应用代码来保证的，release应该放在finally语句中</li>
+<li>可以用来实现互斥锁；也可以设置使用公平策略或者非公平性调度策略</li>
+<li>生产者——消费者模型：<code>PipedOutputStream-PipedInputStream</code>可以实现线程间的直接输出和输入，不必借助其他数据交换中介。适合在两个线程间使用，即单生产者——单消费者情形；不宜在单线程中使用，因为可能导致无限制的等待</li>
+<li>生产者通过关闭PipedOutputStream来知会消费者，避免无限制等待新数据</li>
+</ul>
+</li>
+<li><p>双缓冲：消费者线程消费一个已填充的缓冲区时，另一个缓冲区可以由生产者线程进行填充，实现数据生成和消费的并发，jdk1.5引入的标准库：<code>Exchanger</code>实现了双缓冲，相当于一个只有两个参与方的CyclicBarrier，<code>Exchanger.exchange(V)</code>相当于<code>CyclicBarrier.await()</code></p>
+<ul>
+<li>Exchanger从逻辑上可以被看做一种SynchronousQueue，其内部不维护用于存储产品的存储空间</li>
+<li>消费者和生产者都调用exchange函数来指定一个空的或已经使用过的缓冲区以及指定一个已经填充完毕的缓冲区：<code>public V exchange(V x) throws InterruptedException</code></li>
+<li>线程和任务之间是一对多的关系，即一个线程可以先后执行多个任务</li>
+</ul>
+</li>
+<li><p>线程中断机制</p>
+<ul>
+<li>Java线程中断，通过调用线程的<code>interrupt()</code>方法发起请求中断的指示，线程维护<strong>中断标记</strong>（boolean），此时置为true，表示收到中断。线程通过<code>Thread.currentThread.isInterrupted()</code>可以获取中断标记的值，通过<code>Thread.interrupted()</code>返回当前线程的中断标记值并重置(清空，置为false)中断标记</li>
+<li>目标线程对中断的响应<ul>
+<li>无影响：目标线程在执行阻塞方法/操作</li>
+<li>取消任务的运行：取消那一刻执行的任务，但并影响target继续执行其他任务</li>
+<li>工作者线程停止：target线程的生命状态标记为<code>TERMINATED</code></li>
+</ul>
+</li>
+<li>Java标准库的许多阻塞方法对中断的响应方式是：抛出<code>InterruptedException</code>等异常；有些阻塞方法无法响应中断，如：<strong>InputStream.read(), Lock.lock()以及内部锁的申请</strong><ul>
+<li>响应中断的方法通常是在执行阻塞操作前判断中断标志，若中断标志为true，则抛出<code>InterruptedException</code></li>
+<li>凡是抛出<code>InterruptedException</code>异常的方法，通常会在其抛出该异常之前将当前线程的线程中断标记重置为false，即调用<code>Thread.interrupted()</code>方法</li>
+<li>能够响应中断的阻塞方法/操作而被暂停时，发起这些线程给这些方法的执行线程发送中断会导致Java虚拟机<strong>将响应的线程唤醒，并使其抛出<code>InterruptedException</code></strong></li>
+</ul>
+</li>
+<li>对<code>InterruptedException</code>的处理<ul>
+<li>不捕获，利用throws；捕获后重新抛给上层</li>
+<li>捕获并中断当前线程，恢复中断标志</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">randomPause</span><span class="params">(<span class="keyword">int</span> maxPauseTime)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> sleepTime = rand.nextInt(maxPauseTime);</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        Thread.sleep(sleepTime);</div><div class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">        Thread.currentThread().interrupt(); <span class="comment">// 保留线程中断标记</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>不能使用线程中断标记作为线程停止标记，需要专门的实例变量作为线程停止标记，</p>
+<ul>
+<li><p>通用的停止线程的方案：</p>
+</li>
+<li><p>生产者——消费者模式，生产者需先停止</p>
+</li>
+<li>web应用中的线程停止：</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/multi-threads/" rel="tag"># multi-threads</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/java/multi-threads/Java并发编程实战/" rel="next" title="Java并发编程实战">
+                <i class="fa fa-chevron-left"></i> Java并发编程实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/java/multi-threads/Java保障线程安全的设计技术/" rel="prev" title="Java保障线程安全的设计技术">
+                Java保障线程安全的设计技术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/04/21/java/multi-threads/Java线程间协作/"
+           data-title="Java线程间协作" data-url="http://yoursite.com/2019/04/21/java/multi-threads/Java线程间协作/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">znewcradle</p>
+              <p class="site-description motion-element" itemprop="description">This is a website to show my blogs</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/znewcradle" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程间协作"><span class="nav-number">1.</span> <span class="nav-text">线程间协作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#等待与通知：-wait-notify"><span class="nav-number">1.1.</span> <span class="nav-text">等待与通知： wait/notify</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">znewcradle</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

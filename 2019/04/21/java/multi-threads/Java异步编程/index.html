@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,multi-threads," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Java异步编程[TOC] 概述本文将以Java异步编程为核心，一方面介绍JDK的异步编程源码的实现，突出其中的良好的设计原则和蕴含的设计模式；另一方面会结合相关案例，实践Java异步编程的思想。 本文首先将阐释在多线程编程中同步计算和异步计算的区别。接着，本文将介绍Java Executor框架与异步任务，该部分将结合JDK源码和案例首先说明单个异步任务的提交与执行，再进一步解释如何批量执行异步">
+<meta name="keywords" content="java,multi-threads">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java异步编程">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/index.html">
+<meta property="og:site_name" content="Znewradle&#39;s blog">
+<meta property="og:description" content="Java异步编程[TOC] 概述本文将以Java异步编程为核心，一方面介绍JDK的异步编程源码的实现，突出其中的良好的设计原则和蕴含的设计模式；另一方面会结合相关案例，实践Java异步编程的思想。 本文首先将阐释在多线程编程中同步计算和异步计算的区别。接着，本文将介绍Java Executor框架与异步任务，该部分将结合JDK源码和案例首先说明单个异步任务的提交与执行，再进一步解释如何批量执行异步">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/task.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/exec.png">
+<meta property="og:image" content="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/future.png">
+<meta property="og:updated_time" content="2019-04-21T07:41:38.961Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java异步编程">
+<meta name="twitter:description" content="Java异步编程[TOC] 概述本文将以Java异步编程为核心，一方面介绍JDK的异步编程源码的实现，突出其中的良好的设计原则和蕴含的设计模式；另一方面会结合相关案例，实践Java异步编程的思想。 本文首先将阐释在多线程编程中同步计算和异步计算的区别。接着，本文将介绍Java Executor框架与异步任务，该部分将结合JDK源码和案例首先说明单个异步任务的提交与执行，再进一步解释如何批量执行异步">
+<meta name="twitter:image" content="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/task.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/"/>
+
+
+
+
+
+  <title>Java异步编程 | Znewradle's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Znewradle's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="znewcradle">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Znewradle's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java异步编程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T15:37:13+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/21/java/multi-threads/Java异步编程/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/21/java/multi-threads/Java异步编程/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Java异步编程"><a href="#Java异步编程" class="headerlink" title="Java异步编程"></a>Java异步编程</h1><p>[TOC]</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>本文将以Java异步编程为核心，一方面介绍JDK的异步编程源码的实现，突出其中的良好的设计原则和蕴含的设计模式；另一方面会结合相关案例，实践Java异步编程的思想。</p>
+<p>本文首先将阐释在多线程编程中同步计算和异步计算的区别。接着，本文将介绍Java Executor框架与异步任务，该部分将结合JDK源码和案例首先说明单个异步任务的提交与执行，再进一步解释如何批量执行异步任务。然后，本文将围绕<code>FutureTask</code>结合案例说明其在异步编程中的使用；之后，本文将简单介绍在Java中如何实现计划任务。最后，给出对全文的总结和相关参考资源。</p>
+<h2 id="异步任务和同步任务"><a href="#异步任务和同步任务" class="headerlink" title="异步任务和同步任务"></a>异步任务和同步任务</h2><p>Java中线程与任务是一对多的关系，一个线程可以先后执行多个任务；而每个任务按照执行方式可划分为异步任务和同步任务，二者的区别可以参考下图。从图中可得，同步任务的发起和执行在同一时间线上(a)；而异步任务的发起和执行在不同时间线上(b)。</p>
+<p><img src="task.png" alt="async"></p>
+<p>虽然同步任务往往是阻塞的，异步任务是非阻塞的；但是它们之间并没有必然联系。同步任务在轮询的情况下，也是非阻塞的，只是其主要动作是检查相应任务是否执行结束。同样的，异步任务某些情况下也可能是阻塞的，如通过<code>ThreadPoolExecutor.submit</code>提交的任务，本身是异步执行的；但是，如果发起线程立即调用<code>Future.get</code>会导致线程阻塞。因此，阻塞和非阻塞是任务本身的一种属性和任务的执行方式，即同步和非同步并没有必然联系。</p>
+<p>同步任务，往往直观、简单、容易理解；但是它又往往意味着阻塞，降低了系统的吞吐率。异步任务通常是非阻塞的，有利于提高系统吞吐率，但是其编码复杂且需要更多资源投入。二者各有优劣，需要根据具体问题场景选用合理的方案。</p>
+<h2 id="Executor与异步任务"><a href="#Executor与异步任务" class="headerlink" title="Executor与异步任务"></a><code>Executor</code>与异步任务</h2><h3 id="执行单个异步任务"><a href="#执行单个异步任务" class="headerlink" title="执行单个异步任务"></a>执行单个异步任务</h3><p>在JDK中，Runnable接口和Callable接口是对任务处理逻辑的抽象；Executor接口是对任务执行的抽象。JDK解耦任务的提交与任务的执行细节，屏蔽了不必要细节，提高内聚性，符合设计模式六大原则中的迪米特原则。</p>
+<p><img src="exec.png" alt="exec"></p>
+<p>如上图所示，<code>ExecutorService</code>接口继承自<code>Executor</code>接口，其默认实现类是<code>ThreadPoolExecutor</code>线程池；JDK提供的实用工具类<code>Executors</code>可以根据需求能够创建并返回相应<code>ExecutorService</code>的实例，是典型的工厂模式的应用。其中，常用的返回<code>ExecutorService</code>的工厂方法如下：</p>
+ <table border="1"><br>            <thead><br>                <th>方法</th><br>                <th>适用条件及注意事项</th><br>            </thead><br>            <tbody><br>                <tr><br>                    <td>public static ExecutorService newCachedThreadPool()&lt;/&gt;<br>                    </td><td rowspan="2">适合用于执行大量耗时较短且提交比较频繁的任务。如果提交的任务执行耗时较长，那么可能导致线程池中的工作者线程无限制得增加，最后导致过多的上下文切换，拖慢整个系统。<br>                    </td><br>                </tr><br>                <tr><br>                    <td>public static ExecutorService newCachedThreadPool(ThreadFactory threadFactory)</td><br>                </tr><br>                <tr><br>                    <td>public static ExecutorService newFixedThreadPool(int nThreads)</td><br>                    <td rowspan="2">该线程池中的工作者线程永远不会超时，因此在必要时应主动关闭该线程池</td><br>                </tr><br>                <tr><br>                    <td>public static ExecutorService newFixedThreadPool(int nThreads, ThreadFactory threadFactory)</td><br>                </tr><br>                <tr><br>                    <td>public static ExecutorService newSingleThreadExecutor()</td><br>                    <td rowspan="2">适合用来实现单生产者——单消费者模式</td><br>                </tr><br>                <tr><br>                    <td>public static newSingleThreadExecutor(ThreadFactory threadFactory)</td><br>                </tr><br>            </tbody><br>        </table>
+
+<p>一般单个异步任务的流程是，利用Executors生成<code>ExecutorService</code>线程池，再利用线程池来管理单个异步任务提交和执行，其典型案例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    <span class="comment">// 创建线程池</span></div><div class="line">    ExecutorService executor = Executors.newCachedThreadPool();</div><div class="line"></div><div class="line">    <span class="comment">// 提交异步任务，其中lambda是一个Callable</span></div><div class="line">    Future&lt;String&gt; future = executor.submit(() -&gt; &#123;</div><div class="line">        System.out.println(<span class="string">"running task"</span>);</div><div class="line">        TimeUnit.SECONDS.sleep(<span class="number">5</span>);</div><div class="line">        <span class="keyword">return</span> <span class="string">"return task"</span>;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    <span class="comment">// 在主线程上继续执行其他耗时操作</span></div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        System.out.println(<span class="string">"Other time-consuming task in main thread"</span>);</div><div class="line">        Thread.sleep(<span class="number">1000</span>);</div><div class="line">    &#125; <span class="keyword">catch</span> (InterruptedException ex) &#123;</div><div class="line">        System.out.println(ex.getMessage());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 获取异步任务返回的结果</span></div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        System.out.println(future.get());</div><div class="line">    &#125; <span class="keyword">catch</span> (InterruptedException ex) &#123;</div><div class="line">        System.out.println(ex.getMessage());</div><div class="line">    &#125; <span class="keyword">catch</span> (ExecutionException ex) &#123;</div><div class="line">        System.out.println(<span class="string">"Execution Exception"</span>);</div><div class="line">        System.out.println(ex.getMessage());</div><div class="line">    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">        executor.shutdownNow();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，Future接口是Java多线程中Future模式的实现，一般用来取回Callable执行的状态，其表示一个将来会完成的任务，允许多一段时间后从其中取出执行结果。Future接口是异步计算的绝佳帮手，之后会详细分析其实现类<code>FutureTask</code>，这里给出Future接口的源码。从源码中，可以看出，Future接口非常简单，其设计本身就是用来表达一个已经提交执行的异步任务，方便对异步任务状态监控、取消终止和从中获得结果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>&#123;</div><div class="line">    <span class="comment">// 取消任务的执行</span></div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">cancel</span><span class="params">(<span class="keyword">boolean</span> mayInterruptIfRunning)</span></span>;</div><div class="line">    <span class="comment">// 任务完成前将其取消，返回true</span></div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isCancelled</span><span class="params">()</span></span>;</div><div class="line">    <span class="comment">// 任务正常终止、异常或取消都返回true</span></div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isDone</span><span class="params">()</span></span>;</div><div class="line">    <span class="comment">// 等待任务执行结束</span></div><div class="line">    <span class="function">V <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException, ExecutionException</span>;</div><div class="line">    <span class="comment">// 设定等待时限，取出执行结果</span></div><div class="line">    <span class="function">V <span class="title">get</span><span class="params">(<span class="keyword">long</span> timeout, TimeUnit unit)</span></span></div><div class="line"><span class="function">        <span class="keyword">throws</span> InterruptedException, ExecutionException,TimeoutException</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="执行批量异步任务"><a href="#执行批量异步任务" class="headerlink" title="执行批量异步任务"></a>执行批量异步任务</h3><p><code>CompletionService</code>接口是JDK提供的用于批量执行异步任务的工具，从其实现类<code>ExecutorCompletionService</code>的如下构造器，可得其本身是Executor实例与<code>BlockingQueue</code>的结合体。其中Executor对象用来实现任务的执行，而<code>BlockingQueue</code>则用来存储已经完成的任务（Future对象）同时又能保证这种生产者——消费者模式的线程安全，其主要方法是：</p>
+<ul>
+<li><code>Future&lt;V&gt; take() throws InterruptedException</code>，阻塞方法，用于获取异步任务执行的结果，类似于<code>BlockingQueue#take</code></li>
+<li><code>Future&lt;V&gt; poll()</code>非阻塞方法，用于获取异步任务执行结果，其重载版本可以设置timeout时限，类似于<code>BlockingQueue#poll</code></li>
+<li><code>Future&lt;V&gt; submit</code>用于提交结果，支持传入Callable实例和Runnable实例</li>
+</ul>
+<h2 id="FutureTask的分析与使用"><a href="#FutureTask的分析与使用" class="headerlink" title="FutureTask的分析与使用"></a><code>FutureTask</code>的分析与使用</h2><p>在执行单个异步任务的小节中已经对Future接口有了简单的介绍，Future接口是对于已经提交的任务的抽象。<code>FutureTask</code>本身继承于<code>RunnableFuture</code>接口，该接口继承了Runnable接口和Future接口，即<code>RunnableFuture</code>为Future接口适配了Runnable接口，是典型的适配器模式，其类图如下：</p>
+<p><img src="future.png" alt="future"></p>
+<p>从类图中可以，清楚地看出<code>FutureTask</code>既因为实现Runnable接口而成为任务执行逻辑的抽象，又因为实现Future接口而成为已经提交的任务的抽象。<code>FutureTask</code>的构造函数接受Runnable或者Callable实例，并且可以将Runnable实例转换为Callable实例，以便在run()方法中以统一的方式执行任务逻辑，融合了Runnable接口和Callable接口的优点：一方面其表示的异步任务可以交给专门的工作者线程执行，也可以交由Executor实例（线程池）执行；另一方面，能够直接返回其代表的异步任务的处理结果。所以，<code>FutureTask</code>实现了Runnable接口和Callable接口的统一，即任务抽象统一，由于其本身还是Future接口的实例，所以可以用它来监控提交的任务的状态，取消任务同时异步获取执行结果。综合<code>FutureTask</code>优良的特性，它是异步编程经常会用到的利器。</p>
+<p><code>FutureTask</code>还支持以回调的方式（Callback）的方式来处理任务的执行结果。当<code>FutureTask</code>所代表的任务执行结束后，<code>FutureTask.done()</code>就会被执行，它与<code>FutureTask.run()</code>方法是同一线程。<code>FutureTask.done()</code>是一个protected方法，故而子类可以通过覆盖该方法直接对结果进行处理。<code>FutureTask.done()</code>同样是通过<code>FutureTask.get()</code>来获取任务的执行结果。虽然此时任务已经执行结束get方法的调用并不会导致线程阻塞，但是任务的执行结束，包括正常终止，异常终止以及任务被取消而导致终止。因此，在done方法中，调用get方法之前需要调用<code>isCancelded</code>方法来确认任务是否被取消，以免在调用get方法时，导致抛出异常<code>CancellationException</code>。</p>
+<p>下面通过一个实例，来综合运用<code>FutureTask</code>，体现其运用于异步编程上的优势。JDK提供了<code>DocumentBuilder</code>用于解析XML文档，但是它仅支持同步的方式解析XML文档。因此，必须等待XML文档解析完毕才能从XML文档中进行数据查询，然而XML文档解析可能非常耗时。如果将解析操作改为异步方式，则可以提高系统的运行效率。该实例旨在通过<code>FutureTask</code>统一XML文档解析的同步方式和异步方式，并在异步解析时支持以回调的方式处理XML的解析结果。部分源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ResultHandler</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">onSuccess</span><span class="params">(Document document)</span></span>;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable e)</span> </span>&#123;</div><div class="line">        e.printStackTrace();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ParsingTask</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> InputStream in;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> Executor executor;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> ResultHandler resultHandler;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> Future&lt;Document&gt; <span class="title">execute</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        FutureTask&lt;Document&gt; ft;</div><div class="line"></div><div class="line">        <span class="comment">// 利用Callable来包装解析任务</span></div><div class="line">        <span class="keyword">final</span> Callable&lt;Document&gt; task = <span class="keyword">new</span> Callable&lt;Document&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> Document <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                <span class="keyword">return</span> doParse(in);</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">        <span class="keyword">final</span> Executor theExecutor = executor;</div><div class="line">        <span class="comment">// 同步或异步方式</span></div><div class="line">        <span class="keyword">final</span> <span class="keyword">boolean</span> isAsyncParsing = <span class="keyword">null</span> != theExecutor;</div><div class="line">        <span class="comment">// 回调方式处理解析结果</span></div><div class="line">        <span class="keyword">final</span> ResultHandler rh;</div><div class="line">        <span class="keyword">if</span> (isAsyncParsing &amp;&amp; <span class="keyword">null</span> != (rh = resultHandler)) &#123;</div><div class="line">            ft = <span class="keyword">new</span> FutureTask&lt;Document&gt;(task) &#123;</div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">done</span><span class="params">()</span> </span>&#123;</div><div class="line">                    callbackResultHandler(<span class="keyword">this</span>, rh);</div><div class="line">                &#125;</div><div class="line">            &#125;;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            ft = <span class="keyword">new</span> FutureTask&lt;Document&gt;(task);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (isAsyncParsing) &#123;</div><div class="line">            theExecutor.execute(ft);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            ft.run();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> ft;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">callbackResultHandler</span><span class="params">(FutureTask&lt;Document&gt; ft, ResultHandler rh)</span> </span>&#123;</div><div class="line">        <span class="comment">// 获取任务处理结果前判断任务是否被取消</span></div><div class="line">        <span class="keyword">if</span> (ft.isCancelled()) &#123;</div><div class="line">            Debug.info(<span class="string">"parsing cancelled.%s"</span>, ParsingTask.<span class="keyword">this</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Document doc = ft.get();</div><div class="line">            rh.onSuccess(doc);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException ex) &#123;</div><div class="line">            Debug.info(<span class="string">"retrieving result cancelled.%s"</span>, 	ParsingTask.<span class="keyword">this</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</div><div class="line">            rh.onError(e.getCause());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">static</span> Document <span class="title">doParse</span><span class="params">(InputStream in)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        Document document = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();</div><div class="line">            document = db.parse(in);</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            Tools.silentClose(in);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> document;</div><div class="line">    &#125;</div><div class="line">	<span class="comment">// 完整源码见附件 ...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从以上源码可知，利用Callable来包装原本同步的解析方式，可以用来创建<code>FutureTask</code>。如果提供了<code>executor</code>则会用异步的方式来执行解析任务；反之，直接调用<code>FutureTask#run</code>来以同步方式运行解析；完美地统一了异步方式和同步方式。此外，在创建<code>FutureTask</code>时，通过覆盖done方法可以支持以回调的方式来处理解析结果。最后，回调<code>callbackResultHandler</code>的处理中，除了通过<code>ResultHandler</code>接口来剥离结果处理的逻辑，在方法开头利用<code>FutureTask#isCancelled</code>方法来判断任务是否被取消，以免之后的get调用抛出<code>CancellationException</code>。</p>
+<h2 id="计划任务"><a href="#计划任务" class="headerlink" title="计划任务"></a>计划任务</h2><p>计划任务分为两类，延迟性提交任务和周期性提交任务；JDK提供了<code>ExecutorService</code>接口的子接口<code>ScheduledExecutorService</code>接口，其中定义了一组方法用于实现这两类计划任务。</p>
+<ul>
+<li>延迟性提交任务：由<code>TimeUnit</code>指定时间单位，long型变量指定时长，以指明延迟的期限并在延迟到期后提交任务</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;V&gt; <span class="function">ScheduledFuture&lt;V&gt; <span class="title">schedule</span><span class="params">(Callable&lt;V&gt; callable, <span class="keyword">long</span> delay, TimeUnit unit)</span></span>;</div><div class="line">ScheduledFuture&lt;?&gt; schedule(Runnable command, <span class="keyword">long</span> delay, TimeUnit unit)</div></pre></td></tr></table></figure>
+<ul>
+<li>周期性提交任务：顾名思义，指有一定时间间隔且周期提交的任务；两个API共同点在于都可以指定初始时延，时间单位，并且都只支持Runnable实例；然而两个API间隔周期计算方式不同<ul>
+<li>前者：间隔周期Interval由period指定，但是如果任务执行时间Execution Time超过了period，则以任务执行时间为间隔，故有，Interval &gt;= period</li>
+<li>后者：delay指定上次任务执行结束后到下次任务执行前的时延，故有，Interval = Execution Time + delay</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> ScheduledFuture&lt;?&gt; scheduleAtFixedRate(Runnable command, </div><div class="line">        <span class="keyword">long</span> initialDelay, <span class="keyword">long</span> period, TimeUnit unit);</div><div class="line"><span class="keyword">public</span> ScheduledFuture&lt;?&gt; scheduleWithFixedDelay(Runnable command,</div><div class="line">        <span class="keyword">long</span> initialDelay, <span class="keyword">long</span> delay, TimeUnit unit);</div></pre></td></tr></table></figure>
+<p>由上面对于<code>ScheduledExecutorService</code>接口的API介绍可得，延迟性任务最多只会被执行一次，可以利用schedule方法的返回值<code>ScheduledFuture</code>实例来获取任务执行的结果、执行过程中抛出的异常并且可以取消任务的执行。然而，周期性任务只能接受Runnable实例，无法获取计划任务的一次或多次的执行结果，不过通过返回的<code>ScheduledFuture</code>实例可以取消相应的任务。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文围绕Java异步编程主题，主要介绍了JDK源码对于异步编程的支持，以及其中良好的设计原则与设计模式应用范例，并结合相关主题给出了有针对性的案例。文章从异步编程的基础概念入手，介绍了同步任务和异步任务的概念，并将其与阻塞和非阻塞进行了概念区分。之后，本文一方面结合案例和源码说明了单个异步任务提交和执行流程以及Executors中蕴含的工厂模式；另一方面，依据源码解释了批量执行异步任务的方法和原理。而后，本文围绕<code>FutureTask</code>，分析了其源码和其中的适配器模式，探讨了其用于异步编程的可行性，最后给出了XML文档异步解析的实际案例。最后，本文简单介绍了JDK提供的对于计划任务的支持，对于<code>ScheduledExecutorService</code>接口的API进行了详细说明。</p>
+<p>本文对于Java异步编程的介绍侧重于JDK底层对于异步编程的支持，许多的Java工具库对于JDK代码进行了扩展优化，提供了更易用的API，其中典型代表Google Guava库值得进行深入研究。</p>
+<h2 id="参考资源"><a href="#参考资源" class="headerlink" title="参考资源"></a>参考资源</h2><ul>
+<li>JDK源码</li>
+<li>《Java多线程编程实战指南-核心篇》</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/multi-threads/" rel="tag"># multi-threads</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/java/multi-threads/Java线程管理/" rel="next" title="Java线程管理">
+                <i class="fa fa-chevron-left"></i> Java线程管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/04/21/java/multi-threads/Java异步编程/"
+           data-title="Java异步编程" data-url="http://yoursite.com/2019/04/21/java/multi-threads/Java异步编程/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">znewcradle</p>
+              <p class="site-description motion-element" itemprop="description">This is a website to show my blogs</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/znewcradle" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java异步编程"><span class="nav-number">1.</span> <span class="nav-text">Java异步编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步任务和同步任务"><span class="nav-number">1.2.</span> <span class="nav-text">异步任务和同步任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Executor与异步任务"><span class="nav-number">1.3.</span> <span class="nav-text">Executor与异步任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#执行单个异步任务"><span class="nav-number">1.3.1.</span> <span class="nav-text">执行单个异步任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行批量异步任务"><span class="nav-number">1.3.2.</span> <span class="nav-text">执行批量异步任务</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FutureTask的分析与使用"><span class="nav-number">1.4.</span> <span class="nav-text">FutureTask的分析与使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#计划任务"><span class="nav-number">1.5.</span> <span class="nav-text">计划任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资源"><span class="nav-number">1.7.</span> <span class="nav-text">参考资源</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">znewcradle</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

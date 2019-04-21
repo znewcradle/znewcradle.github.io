@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="java,multi-threads," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="线程管理 线程和线程组类似文件和文件夹，有父线程组和子线程组；JVM在创建main线程时也会为其指定线程组。所以，Java中任何一个线程都有一个线程组与之关联，可以通过调用来获取线程组Thread.getThreadGroup()  利用void uncaughtException(Thread t, Throwable e)实现线程的监控；  启动thread前调用thread.setUncau">
+<meta name="keywords" content="java,multi-threads">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java线程管理">
+<meta property="og:url" content="http://yoursite.com/2019/04/21/java/multi-threads/Java线程管理/index.html">
+<meta property="og:site_name" content="Znewradle&#39;s blog">
+<meta property="og:description" content="线程管理 线程和线程组类似文件和文件夹，有父线程组和子线程组；JVM在创建main线程时也会为其指定线程组。所以，Java中任何一个线程都有一个线程组与之关联，可以通过调用来获取线程组Thread.getThreadGroup()  利用void uncaughtException(Thread t, Throwable e)实现线程的监控；  启动thread前调用thread.setUncau">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-21T07:36:31.774Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java线程管理">
+<meta name="twitter:description" content="线程管理 线程和线程组类似文件和文件夹，有父线程组和子线程组；JVM在创建main线程时也会为其指定线程组。所以，Java中任何一个线程都有一个线程组与之关联，可以通过调用来获取线程组Thread.getThreadGroup()  利用void uncaughtException(Thread t, Throwable e)实现线程的监控；  启动thread前调用thread.setUncau">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/21/java/multi-threads/Java线程管理/"/>
+
+
+
+
+
+  <title>Java线程管理 | Znewradle's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Znewradle's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/21/java/multi-threads/Java线程管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="znewcradle">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Znewradle's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java线程管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-21T15:36:04+08:00">
+                2019-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/21/java/multi-threads/Java线程管理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/21/java/multi-threads/Java线程管理/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="线程管理"><a href="#线程管理" class="headerlink" title="线程管理"></a>线程管理</h2><ol>
+<li><p>线程和线程组类似文件和文件夹，有父线程组和子线程组；JVM在创建main线程时也会为其指定线程组。所以，Java中任何一个线程都有一个线程组与之关联，可以通过调用来获取线程组<code>Thread.getThreadGroup()</code></p>
+</li>
+<li><p>利用<code>void uncaughtException(Thread t, Throwable e)</code>实现线程的监控；</p>
+<ul>
+<li>启动thread前调用<code>thread.setUncaughtExceptionHandler(eh)</code>为thread关联一个<code>UncaughtExceptionHandler</code>；</li>
+<li>当thread抛出未被捕获的异常后<code>thread.run()</code>返回，接着thread会在终止前调用<code>eh.uncaughtException</code>方法（<code>UncaughtExceptionHandler.uncaughtException</code>调用结束前，线程还是存活的）</li>
+<li>线程没有<code>setUncaughtExceptionHandler</code>则会调用所属线程组的<code>uncaughtException</code>方法，线程组会调用其父线程组的<code>uncaughtException</code>方法并传递（t, e）。如果线程组没有父线程组，就会调用默认的<code>UncaughtExceptionHandler</code>的<code>uncaughtException</code>方法来处理线程的异常终止</li>
+</ul>
+</li>
+<li><p>线程工厂</p>
+<ul>
+<li>JDK支持线程工厂接口<code>ThreadFactory</code>其内方法<code>public Thread newThread(Runnable r)</code></li>
+<li>利用<code>newThread</code>可以创建线程，其参数Runnable r代表需要执行的任务；在<code>ThreadFactory.newThread()</code>中封装线程创建逻辑，可以统一处理线程的创建、配置</li>
+</ul>
+</li>
+<li><p>线程的高效利用：线程池</p>
+<ul>
+<li>线程的开销：线程的创建与启动开销；线程的销毁；线程的调度开销；能够创建的线程数受限于新系统所拥有的处理器数目</li>
+<li>线程池可被看做生产者——消费者模式，JDK中<code>ThreadPoolExecutor</code>类即线程池，可以通过调用<code>ThreadPoolExecutor.submit</code>方法向其提交任务，返回Future对象。其中，线程池服务内部维护的线程相当于消费者线程，线程池的客户端相当于生产者线程</li>
+<li>线程池大小：当前线程池大小，核心线程池大小 &lt;= 最大线程池大小</li>
+<li><code>ThreadPoolExecutor</code>的构造器中最复杂</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize, <span class="keyword">int</span> maximumPoolSize,</span></span></div><div class="line"><span class="function"><span class="params">                         <span class="keyword">long</span> keepAliveTime, TimeUnit unit,</span></span></div><div class="line"><span class="function"><span class="params">                         BlockingQueue&lt;Runnable&gt; workQueue,</span></span></div><div class="line"><span class="function"><span class="params">                         ThreadFactory threadFactory,</span></span></div><div class="line"><span class="function"><span class="params">                         RejectedExecutionHandler handler)</span></span></div><div class="line"><span class="function"><span class="comment">// workQueue是工作队列的阻塞队列，生产者——消费者模式的传输通道</span></span></div><div class="line"><span class="function"><span class="comment">// corePoolSize用于指定线程池核心大小</span></span></div><div class="line"><span class="function"><span class="comment">// maximumPoolSize 用于指定最大线程池大小</span></span></div><div class="line"><span class="function"><span class="comment">// keepAliveTime和unit结合用于指定线程池中空闲线程的最大存活时间</span></span></div><div class="line"><span class="function"><span class="comment">// threadFactory指定用于创建工作者线程的线程工厂</span></span></div><div class="line"><span class="function"><span class="comment">// handler: 当工作队列满时，线程池会继续调用threadFactory来创建新工作者线程，</span></span></div><div class="line"><span class="function">    <span class="comment">// 直到线程池满。线程池满则会调用RejectedExecutionHandler来拒绝提交任务</span></span></div><div class="line"><span class="function">    <span class="comment">// void rejectedExecution(Runnable r, ThreadPoolExecutor executor)</span></span></div><div class="line"><span class="function">    <span class="comment">// 通过调用setRejectedExecutionHandler(...)来设置rejecthandler</span></span></div><div class="line"><span class="function">    <span class="comment">// 默认使用ThreadPoolExecutor.AbortPolicy，还有其他选项</span></span></div></pre></td></tr></table></figure>
+<ul>
+<li><code>ThreadPoolExectuor.shutdown()/shutdownNow()</code>可用来关闭线程池，<ul>
+<li>使用shutdown()已经提交的任务会继续执行，而被新提交的任务会像线程池饱和时一样被拒绝（所以该方法返回时，线程池可能尚未关闭）</li>
+<li>使用shutdownNow()则正在执行的任务也会被停止，提交的任务不会执行，新任务被拒绝，内部调用线程的interrupt方法来停止正在执行的任务（因此某些无法响应中断的任务可能永远不会停止）</li>
+</ul>
+</li>
+<li>任务的处理结果、异常处理与取消<ul>
+<li>获得处理结果：<code>public &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task)</code>，Callable接口是增强版的Runnable接口，唯一方法<code>V call() throws Exception</code>，通过<code>Execturos.callable(Runable task, T result)</code>能够将Runnable接口转换为Callable接口。Future#get方法可以获取任务的处理结果。如果任务尚未执行完毕，那么Future#get会使当前线程暂停，是个阻塞方法，能够抛出<code>InterruptedException</code>，可以响应中断，等待会导致上下文切换。因此应该尽早提交任务，仅在需要时才调用<code>get</code>方法</li>
+<li><code>Future.isDone()</code>可以检测响应的任务是否执行完毕，如果完毕或者任务被取消，或抛出异常，都会返回true；用<code>V get(long timeout, TimeUnit unit) throws XXEx</code>可以指定等待时间，到期，会抛出TimeoutException；捕获之后，执行<code>Future.cancel</code>来取消任务的执行</li>
+<li>利用以下方法可以进行线程池监控：<code>getPoolSize(), getQueue(), getLargestPoolSize(), getActiveCount(), getTaskCount(), getCompletedTaskCount()</code></li>
+<li>同一线程池只能用来执行相互独立的任务，彼此有依赖关系的任务需提交给不同的线程执行以避免死锁</li>
+<li>通过ThreadPoolExecutor.submit提交给线程池的任务，其执行过程中抛出的未捕获异常并不会导致与该线程池中的工作者线程关联的<code>UncaughtExceptionhandler</code>的<code>uncaughtException</code>方法被调用；<code>execute</code><strong>反之</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/multi-threads/" rel="tag"># multi-threads</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/java/multi-threads/Java保障线程安全的设计技术/" rel="next" title="Java保障线程安全的设计技术">
+                <i class="fa fa-chevron-left"></i> Java保障线程安全的设计技术
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/21/java/multi-threads/Java异步编程/" rel="prev" title="Java异步编程">
+                Java异步编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2019/04/21/java/multi-threads/Java线程管理/"
+           data-title="Java线程管理" data-url="http://yoursite.com/2019/04/21/java/multi-threads/Java线程管理/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">znewcradle</p>
+              <p class="site-description motion-element" itemprop="description">This is a website to show my blogs</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/znewcradle" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程管理"><span class="nav-number">1.</span> <span class="nav-text">线程管理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">znewcradle</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
